@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion d'Incidents et Maintenance IT</title>
+    <title>Gestion d'Incidents et Maintenance IT - Synchronisation Temps Réel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -788,6 +788,28 @@
             border-radius: 10px;
         }
         
+        .connected-users {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .user-badge {
+            width: 25px;
+            height: 25px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
@@ -871,6 +893,7 @@
                         <p><strong>Mot de passe :</strong> Admin@123</p>
                     </div>
                     <p style="font-size: 12px; color: #666;">⚠️ À changer après première connexion</p>
+                    <p style="font-size: 12px; color: #3498db; margin-top: 10px;">🔄 Synchronisation temps réel entre administrateurs activée</p>
                 </div>
                 
                 <form id="loginForm">
@@ -884,6 +907,10 @@
                             <input type="password" id="loginPassword" value="Admin@123" required>
                             <span class="password-toggle" onclick="togglePasswordVisibility('loginPassword')">👁️</span>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminName">Nom de l'administrateur</label>
+                        <input type="text" id="adminName" placeholder="Votre nom" value="Admin 1">
                     </div>
                     <button type="submit" class="btn-success" style="width: 100%;">Se connecter</button>
                 </form>
@@ -904,6 +931,11 @@
                             <span id="syncStatus">Connecté</span>
                         </div>
                     </div>
+                </div>
+                <div class="connected-users" id="connectedUsers">
+                    <span>👥</span>
+                    <span id="userCount">1</span>
+                    <span>admin(s) connecté(s)</span>
                 </div>
                 <button id="exportExcelBtn" class="btn-success">📊 Export Excel</button>
                 <button id="logoutBtn" class="btn-danger">🚪 Déconnexion</button>
@@ -940,10 +972,10 @@
             </div>
             
             <div class="card">
-                <h2>📋 Incidents récents <span class="realtime-badge" id="recentIncidentsBadge">EN DIRECT</span></h2>
+                <h2>📋 Incidents récents <span class="realtime-badge" id="recentIncidentsBadge">SYNC</span></h2>
                 <table id="recentIncidents">
                     <thead>
-                        <tr>
+                        32fb
                             <th>ID</th>
                             <th>Ticket</th>
                             <th>Nom et Prénom</th>
@@ -960,7 +992,7 @@
             </div>
             
             <div class="card">
-                <h2>📅 Maintenances à venir <span class="realtime-badge" id="upcomingMaintenanceBadge">EN DIRECT</span></h2>
+                <h2>📅 Maintenances à venir <span class="realtime-badge" id="upcomingMaintenanceBadge">SYNC</span></h2>
                 <table id="upcomingMaintenance">
                     <thead>
                         32fb
@@ -1076,7 +1108,7 @@
             </div>
             
             <div class="card">
-                <h2>📋 Liste des Incidents <span class="realtime-badge" id="incidentsTableBadge">EN DIRECT</span></h2>
+                <h2>📋 Liste des Incidents <span class="realtime-badge" id="incidentsTableBadge">SYNC</span></h2>
                 <div class="filters">
                     <div class="filter-group">
                         <label for="filterStatus">Filtrer par statut</label>
@@ -1214,7 +1246,7 @@
             </div>
             
             <div class="card">
-                <h2>📅 Calendrier des Maintenances <span class="realtime-badge" id="maintenanceTableBadge">EN DIRECT</span></h2>
+                <h2>📅 Calendrier des Maintenances <span class="realtime-badge" id="maintenanceTableBadge">SYNC</span></h2>
                 <div class="filters">
                     <div class="filter-group">
                         <label for="filterMaintenanceType">Filtrer par type</label>
@@ -1360,6 +1392,36 @@
                 </div>
                 
                 <div class="data-retention">
+                    <h3>🔄 Synchronisation temps réel</h3>
+                    <div class="form-group">
+                        <label for="syncMethod">Méthode de synchronisation</label>
+                        <select id="syncMethod">
+                            <option value="broadcast">BroadcastChannel (recommandé)</option>
+                            <option value="localstorage">LocalStorage</option>
+                        </select>
+                        <small style="color: #666; display: block; margin-top: 5px;">La synchronisation permet le partage des données entre administrateurs</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="syncInterval">Intervalle de synchronisation (secondes)</label>
+                        <select id="syncInterval">
+                            <option value="1">1 seconde (temps réel)</option>
+                            <option value="2">2 secondes (recommandé)</option>
+                            <option value="5">5 secondes</option>
+                            <option value="10">10 secondes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="sync-status" style="margin-top: 10px; padding: 10px; background: var(--light); border-radius: 5px;">
+                        <span class="sync-dot" id="realtimeDot"></span>
+                        <span id="realtimeStatus">Statut de la connexion...</span>
+                    </div>
+                    
+                    <button id="syncNow" class="btn-success">Synchroniser maintenant</button>
+                    <button id="forceSync" class="btn-info" style="margin-left: 10px;">Forcer la synchronisation</button>
+                </div>
+                
+                <div class="data-retention">
                     <h3>💾 Durée de conservation des données</h3>
                     <div class="form-group">
                         <label for="retentionPeriod">Conserver les données pendant (en jours)</label>
@@ -1381,34 +1443,6 @@
                     <button id="applyRetention" class="btn-warning">Appliquer la politique de conservation</button>
                     <button id="cleanOldData" class="btn-danger">Nettoyer les données anciennes</button>
                 </div>
-                
-                <div class="data-retention" style="margin-top: 20px;">
-                    <h3>🔄 Configuration du temps réel</h3>
-                    <div class="form-group">
-                        <label for="syncInterval">Intervalle de synchronisation (secondes)</label>
-                        <select id="syncInterval">
-                            <option value="2">2 secondes (recommandé)</option>
-                            <option value="5">5 secondes</option>
-                            <option value="10">10 secondes</option>
-                            <option value="30">30 secondes</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="realtimeEnabled">Activer le mode temps réel</label>
-                        <select id="realtimeEnabled">
-                            <option value="true">Activé</option>
-                            <option value="false">Désactivé</option>
-                        </select>
-                    </div>
-                    
-                    <div class="sync-status" style="margin-top: 10px; padding: 10px; background: var(--light); border-radius: 5px;">
-                        <span class="sync-dot" id="realtimeDot"></span>
-                        <span id="realtimeStatus">Statut de la connexion...</span>
-                    </div>
-                    
-                    <button id="syncNow" class="btn-success">Synchroniser maintenant</button>
-                </div>
 
                 <div class="data-retention" style="margin-top: 20px;">
                     <h3>📧 Notifications</h3>
@@ -1420,6 +1454,11 @@
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="desktopNotifications" checked> Activer les notifications bureau
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="syncNotifications" checked> Afficher les notifications de synchronisation
                         </label>
                     </div>
                 </div>
@@ -1533,6 +1572,7 @@
         };
         
         let currentUser = null;
+        let currentAdminName = 'Admin';
         let nextIncidentId = parseInt(localStorage.getItem('nextIncidentId')) || 1;
         let nextMaintenanceId = parseInt(localStorage.getItem('nextMaintenanceId')) || 1;
         let nextIncidentTicket = parseInt(localStorage.getItem('nextIncidentTicket')) || 1;
@@ -1543,12 +1583,20 @@
         let realtimeEnabled = localStorage.getItem('realtimeEnabled') !== 'false';
         let emailNotifications = localStorage.getItem('emailNotifications') !== 'false';
         let desktopNotifications = localStorage.getItem('desktopNotifications') !== 'false';
+        let syncNotifications = localStorage.getItem('syncNotifications') !== 'false';
         
         // Protection des onglets
         let protectedTabsPassword = localStorage.getItem('protectedTabsPassword') || 'admin123';
         let reportsUnlocked = false;
         let settingsUnlocked = false;
         let currentTargetTab = null;
+
+        // Synchronisation temps réel
+        let broadcastChannel = null;
+        let syncTimer = null;
+        let connectedUsers = new Set();
+        let lastSyncTimestamp = Date.now();
+        let syncMethod = 'broadcast';
 
         // Variables pour les graphiques de rapports
         let reportsPriorityChart, reportsDepartmentChart, reportsMaintenanceTypeChart, reportsTimelineChart;
@@ -1615,6 +1663,363 @@
         };
 
         // ============================================
+        // FONCTIONS DE SYNCHRONISATION TEMPS RÉEL
+        // ============================================
+        
+        function initRealtimeSync() {
+            try {
+                // Créer un canal de broadcast pour la communication entre onglets
+                broadcastChannel = new BroadcastChannel('it_management_sync');
+                
+                broadcastChannel.onmessage = function(event) {
+                    const { type, data, sender, timestamp } = event.data;
+                    
+                    // Ignorer ses propres messages
+                    if (sender === currentAdminName) return;
+                    
+                    // Mettre à jour le timestamp de dernière synchronisation
+                    lastSyncTimestamp = timestamp;
+                    
+                    switch(type) {
+                        case 'USER_CONNECTED':
+                            handleUserConnected(data);
+                            break;
+                        case 'USER_DISCONNECTED':
+                            handleUserDisconnected(data);
+                            break;
+                        case 'DATA_UPDATE':
+                            handleDataUpdate(data);
+                            break;
+                        case 'INCIDENT_CREATED':
+                            handleIncidentCreated(data);
+                            break;
+                        case 'INCIDENT_UPDATED':
+                            handleIncidentUpdated(data);
+                            break;
+                        case 'INCIDENT_DELETED':
+                            handleIncidentDeleted(data);
+                            break;
+                        case 'MAINTENANCE_CREATED':
+                            handleMaintenanceCreated(data);
+                            break;
+                        case 'MAINTENANCE_UPDATED':
+                            handleMaintenanceUpdated(data);
+                            break;
+                        case 'MAINTENANCE_DELETED':
+                            handleMaintenanceDeleted(data);
+                            break;
+                        case 'SYNC_REQUEST':
+                            handleSyncRequest();
+                            break;
+                        case 'FULL_SYNC':
+                            handleFullSync(data);
+                            break;
+                        default:
+                            console.log('Message non reconnu:', type);
+                    }
+                };
+                
+                // Annoncer sa connexion
+                broadcastChannel.postMessage({
+                    type: 'USER_CONNECTED',
+                    data: { name: currentAdminName, timestamp: new Date().toISOString() },
+                    sender: currentAdminName,
+                    timestamp: Date.now()
+                });
+                
+                // Nettoyer les utilisateurs déconnectés après 30 secondes
+                setInterval(() => {
+                    const now = Date.now();
+                    connectedUsers.forEach(user => {
+                        if (now - user.lastSeen > 30000) {
+                            connectedUsers.delete(user);
+                        }
+                    });
+                    updateConnectedUsersDisplay();
+                }, 10000);
+                
+                updateRealtimeStatus(true);
+                showToast('info', 'Synchronisation activée', 'Les données seront partagées en temps réel avec les autres administrateurs');
+                
+            } catch (error) {
+                console.error('Erreur d\'initialisation du BroadcastChannel:', error);
+                updateRealtimeStatus(false);
+            }
+        }
+        
+        function handleUserConnected(userData) {
+            connectedUsers.add(userData.name);
+            updateConnectedUsersDisplay();
+            if (syncNotifications) {
+                showToast('info', 'Nouvel administrateur connecté', `${userData.name} est maintenant en ligne`);
+            }
+        }
+        
+        function handleUserDisconnected(userData) {
+            connectedUsers.delete(userData.name);
+            updateConnectedUsersDisplay();
+            if (syncNotifications) {
+                showToast('warning', 'Administrateur déconnecté', `${userData.name} s'est déconnecté`);
+            }
+        }
+        
+        function handleDataUpdate(data) {
+            const { incidents: newIncidents, maintenances: newMaintenances, images } = data;
+            
+            if (newIncidents && JSON.stringify(incidents) !== JSON.stringify(newIncidents)) {
+                incidents = newIncidents;
+                saveIncidents();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('success', 'Données synchronisées', 'Mise à jour reçue d\'un autre administrateur');
+                }
+            }
+            
+            if (newMaintenances && JSON.stringify(maintenances) !== JSON.stringify(newMaintenances)) {
+                maintenances = newMaintenances;
+                saveMaintenances();
+                refreshAllViews();
+            }
+            
+            if (images) {
+                incidentImages = images.incidentImages || incidentImages;
+                resolutionImages = images.resolutionImages || resolutionImages;
+                saveImages();
+            }
+        }
+        
+        function handleIncidentCreated(incident) {
+            // Vérifier si l'incident existe déjà
+            if (!incidents.find(i => i.id === incident.id)) {
+                incidents.push(incident);
+                saveIncidents();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('info', 'Nouvel incident', `${incident.ticketNumber} créé par un autre administrateur`);
+                }
+                playNotificationSound();
+            }
+        }
+        
+        function handleIncidentUpdated(incident) {
+            const index = incidents.findIndex(i => i.id === incident.id);
+            if (index !== -1) {
+                incidents[index] = incident;
+                saveIncidents();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('info', 'Incident mis à jour', `${incident.ticketNumber} modifié par un autre administrateur`);
+                }
+            }
+        }
+        
+        function handleIncidentDeleted(incidentId) {
+            const incident = incidents.find(i => i.id === incidentId);
+            if (incident) {
+                incidents = incidents.filter(i => i.id !== incidentId);
+                saveIncidents();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('warning', 'Incident supprimé', `${incident.ticketNumber} a été supprimé par un autre administrateur`);
+                }
+            }
+        }
+        
+        function handleMaintenanceCreated(maintenance) {
+            if (!maintenances.find(m => m.id === maintenance.id)) {
+                maintenances.push(maintenance);
+                saveMaintenances();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('info', 'Nouvelle maintenance', `${maintenance.ticketNumber} créée par un autre administrateur`);
+                }
+                playNotificationSound();
+            }
+        }
+        
+        function handleMaintenanceUpdated(maintenance) {
+            const index = maintenances.findIndex(m => m.id === maintenance.id);
+            if (index !== -1) {
+                maintenances[index] = maintenance;
+                saveMaintenances();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('info', 'Maintenance mise à jour', `${maintenance.ticketNumber} modifiée par un autre administrateur`);
+                }
+            }
+        }
+        
+        function handleMaintenanceDeleted(maintenanceId) {
+            const maintenance = maintenances.find(m => m.id === maintenanceId);
+            if (maintenance) {
+                maintenances = maintenances.filter(m => m.id !== maintenanceId);
+                saveMaintenances();
+                refreshAllViews();
+                if (syncNotifications) {
+                    showToast('warning', 'Maintenance supprimée', `${maintenance.ticketNumber} a été supprimée par un autre administrateur`);
+                }
+            }
+        }
+        
+        function handleSyncRequest() {
+            // Envoyer toutes les données
+            broadcastChannel.postMessage({
+                type: 'FULL_SYNC',
+                data: {
+                    incidents: incidents,
+                    maintenances: maintenances,
+                    images: {
+                        incidentImages: incidentImages,
+                        resolutionImages: resolutionImages
+                    },
+                    counters: {
+                        nextIncidentId,
+                        nextMaintenanceId,
+                        nextIncidentTicket,
+                        nextMaintenanceTicket
+                    }
+                },
+                sender: currentAdminName,
+                timestamp: Date.now()
+            });
+        }
+        
+        function handleFullSync(data) {
+            if (data.incidents && JSON.stringify(incidents) !== JSON.stringify(data.incidents)) {
+                incidents = data.incidents;
+                saveIncidents();
+            }
+            if (data.maintenances && JSON.stringify(maintenances) !== JSON.stringify(data.maintenances)) {
+                maintenances = data.maintenances;
+                saveMaintenances();
+            }
+            if (data.images) {
+                incidentImages = data.images.incidentImages || incidentImages;
+                resolutionImages = data.images.resolutionImages || resolutionImages;
+                saveImages();
+            }
+            if (data.counters) {
+                nextIncidentId = data.counters.nextIncidentId;
+                nextMaintenanceId = data.counters.nextMaintenanceId;
+                nextIncidentTicket = data.counters.nextIncidentTicket;
+                nextMaintenanceTicket = data.counters.nextMaintenanceTicket;
+                localStorage.setItem('nextIncidentId', nextIncidentId);
+                localStorage.setItem('nextMaintenanceId', nextMaintenanceId);
+                localStorage.setItem('nextIncidentTicket', nextIncidentTicket);
+                localStorage.setItem('nextMaintenanceTicket', nextMaintenanceTicket);
+            }
+            refreshAllViews();
+            if (syncNotifications) {
+                showToast('success', 'Synchronisation complète', 'Toutes les données ont été synchronisées');
+            }
+        }
+        
+        function broadcastDataUpdate(type, data) {
+            if (!broadcastChannel) return;
+            
+            try {
+                broadcastChannel.postMessage({
+                    type: type,
+                    data: data,
+                    sender: currentAdminName,
+                    timestamp: Date.now()
+                });
+            } catch (error) {
+                console.error('Erreur lors de la diffusion:', error);
+            }
+        }
+        
+        function broadcastIncidentCreated(incident) {
+            broadcastDataUpdate('INCIDENT_CREATED', incident);
+        }
+        
+        function broadcastIncidentUpdated(incident) {
+            broadcastDataUpdate('INCIDENT_UPDATED', incident);
+        }
+        
+        function broadcastIncidentDeleted(incidentId) {
+            broadcastDataUpdate('INCIDENT_DELETED', incidentId);
+        }
+        
+        function broadcastMaintenanceCreated(maintenance) {
+            broadcastDataUpdate('MAINTENANCE_CREATED', maintenance);
+        }
+        
+        function broadcastMaintenanceUpdated(maintenance) {
+            broadcastDataUpdate('MAINTENANCE_UPDATED', maintenance);
+        }
+        
+        function broadcastMaintenanceDeleted(maintenanceId) {
+            broadcastDataUpdate('MAINTENANCE_DELETED', maintenanceId);
+        }
+        
+        function broadcastFullSync() {
+            broadcastDataUpdate('FULL_SYNC', {
+                incidents: incidents,
+                maintenances: maintenances,
+                images: {
+                    incidentImages: incidentImages,
+                    resolutionImages: resolutionImages
+                },
+                counters: {
+                    nextIncidentId,
+                    nextMaintenanceId,
+                    nextIncidentTicket,
+                    nextMaintenanceTicket
+                }
+            });
+        }
+        
+        function updateConnectedUsersDisplay() {
+            const userCountSpan = document.getElementById('userCount');
+            if (userCountSpan) {
+                userCountSpan.textContent = connectedUsers.size + 1;
+            }
+        }
+        
+        function updateRealtimeStatus(isConnected) {
+            const dot = document.getElementById('realtimeDot');
+            const status = document.getElementById('realtimeStatus');
+            
+            if (dot && status) {
+                if (isConnected) {
+                    dot.className = 'sync-dot';
+                    status.textContent = `Connecté - ${connectedUsers.size + 1} administrateur(s) en ligne`;
+                } else {
+                    dot.className = 'sync-dot offline';
+                    status.textContent = 'Mode hors ligne - Synchronisation désactivée';
+                }
+            }
+        }
+        
+        function playNotificationSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,U3RlYWx0aCBzb3VuZA==');
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log('Erreur lecture son:', e));
+            } catch(e) {}
+        }
+        
+        function refreshAllViews() {
+            loadIncidents();
+            loadMaintenances();
+            updateDashboard();
+            updateCalendar();
+            updateCharts();
+            updateTicketNumbers();
+            if (document.getElementById('reports').classList.contains('active')) {
+                loadReportsCharts();
+            }
+        }
+        
+        function forceFullSync() {
+            if (broadcastChannel) {
+                handleSyncRequest();
+                showToast('success', 'Synchronisation forcée', 'Demande de synchronisation envoyée à tous les administrateurs');
+            }
+        }
+        
+        // ============================================
         // FONCTIONS DE PROTECTION DES ONGLETS
         // ============================================
         
@@ -1649,7 +2054,6 @@
         function cancelProtectedTabUnlock() {
             document.getElementById('protectedTabLockScreen').style.display = 'none';
             currentTargetTab = null;
-            // Rester sur l'onglet actif
         }
 
         // ============================================
@@ -1661,7 +2065,8 @@
                 e.preventDefault();
                 const username = document.getElementById('loginUsername').value;
                 const password = document.getElementById('loginPassword').value;
-                login(username, password);
+                const adminName = document.getElementById('adminName').value;
+                login(username, password, adminName);
             });
             
             // Initialisation
@@ -1674,6 +2079,8 @@
             // Restaurer les préférences
             document.getElementById('emailNotifications').checked = emailNotifications;
             document.getElementById('desktopNotifications').checked = desktopNotifications;
+            document.getElementById('syncNotifications').checked = syncNotifications;
+            document.getElementById('syncInterval').value = syncInterval;
             
             // Setup image uploads
             setupImageUpload('incidentImageUpload', 'incidentImagePreview', 'incidentImage', 'incident');
@@ -1682,16 +2089,17 @@
         // ============================================
         // FONCTION DE CONNEXION
         // ============================================
-        function login(username, password) {
+        function login(username, password, adminName) {
             if (username === defaultUser.username && password === defaultUser.password) {
                 currentUser = defaultUser;
+                currentAdminName = adminName || 'Administrateur';
                 defaultUser.lastLogin = new Date().toISOString();
                 
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 
-                document.getElementById('userName').textContent = defaultUser.fullname;
-                document.getElementById('userAvatar').textContent = defaultUser.avatar;
+                document.getElementById('userName').textContent = `${defaultUser.fullname} (${currentAdminName})`;
+                document.getElementById('userAvatar').textContent = currentAdminName.charAt(0).toUpperCase();
                 
                 // Charger les données
                 loadIncidents();
@@ -1699,11 +2107,13 @@
                 updateDashboard();
                 updateCalendar();
                 updateTicketNumbers();
-                updateRealtimeStatus();
-                startSyncTimer();
                 initCharts();
                 
-                showToast('success', 'Connexion réussie', `Bienvenue ${defaultUser.fullname}`);
+                // Initialiser la synchronisation temps réel
+                initRealtimeSync();
+                startSyncTimer();
+                
+                showToast('success', 'Connexion réussie', `Bienvenue ${currentAdminName}`);
             } else {
                 showToast('error', 'Erreur de connexion', 'Nom d\'utilisateur ou mot de passe incorrect');
             }
@@ -1747,6 +2157,9 @@
                     }
                     if (target === 'dashboard') {
                         updateCharts();
+                    }
+                    if (target === 'reports') {
+                        loadReportsCharts();
                     }
                 });
             });
@@ -1812,25 +2225,23 @@
                 localStorage.setItem('retentionPeriod', retentionPeriod);
                 applyRetentionPolicy();
                 showToast('success', 'Paramètres enregistrés', 'La politique de conservation a été mise à jour');
+                broadcastFullSync();
             });
             
             document.getElementById('cleanOldData')?.addEventListener('click', cleanOldData);
             
             // Synchronisation
             document.getElementById('syncNow')?.addEventListener('click', syncData);
+            document.getElementById('forceSync')?.addEventListener('click', forceFullSync);
             document.getElementById('syncInterval')?.addEventListener('change', function() {
                 syncInterval = parseInt(this.value);
                 localStorage.setItem('syncInterval', syncInterval);
                 startSyncTimer();
             });
 
-            document.getElementById('realtimeEnabled')?.addEventListener('change', function() {
-                realtimeEnabled = this.value === 'true';
-                localStorage.setItem('realtimeEnabled', realtimeEnabled);
-                updateRealtimeStatus();
-                if (realtimeEnabled) {
-                    startSyncTimer();
-                }
+            document.getElementById('syncMethod')?.addEventListener('change', function() {
+                syncMethod = this.value;
+                localStorage.setItem('syncMethod', syncMethod);
             });
             
             // Notifications
@@ -1847,6 +2258,11 @@
                 }
             });
             
+            document.getElementById('syncNotifications')?.addEventListener('change', function() {
+                syncNotifications = this.checked;
+                localStorage.setItem('syncNotifications', syncNotifications);
+            });
+            
             // Modales
             document.querySelectorAll('.close-modal').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1857,6 +2273,16 @@
             // Déconnexion
             document.getElementById('logoutBtn')?.addEventListener('click', function() {
                 showConfirm('Êtes-vous sûr de vouloir vous déconnecter ?', function() {
+                    // Annoncer la déconnexion
+                    if (broadcastChannel) {
+                        broadcastChannel.postMessage({
+                            type: 'USER_DISCONNECTED',
+                            data: { name: currentAdminName },
+                            sender: currentAdminName,
+                            timestamp: Date.now()
+                        });
+                        broadcastChannel.close();
+                    }
                     currentUser = null;
                     reportsUnlocked = false;
                     settingsUnlocked = false;
@@ -1864,6 +2290,7 @@
                     document.getElementById('loginModal').style.display = 'flex';
                     document.getElementById('loginPassword').value = 'Admin@123';
                     document.getElementById('loginUsername').value = 'admin';
+                    document.getElementById('adminName').value = '';
                 });
             });
         }
@@ -2207,6 +2634,7 @@
                     resolutionImages[incidentId].push(imageData);
                 }
                 saveImages();
+                broadcastFullSync();
             }
         }
 
@@ -2221,6 +2649,7 @@
                     delete resolutionImages[incidentId];
                 }
                 saveImages();
+                broadcastFullSync();
             }
         };
 
@@ -2420,14 +2849,16 @@
             
             showToast('success', 'Incident créé', `Incident ${ticketNumber} créé avec succès`);
             
+            // Diffuser l'incident aux autres administrateurs
+            broadcastIncidentCreated(incident);
+            broadcastFullSync();
+            
             if (desktopNotifications && Notification.permission === 'granted') {
                 new Notification('Nouvel incident', {
                     body: `${ticketNumber} - ${description.substring(0, 50)}...`,
                     icon: '🔔'
                 });
             }
-            
-            syncData();
         }
 
         // ============================================
@@ -2477,7 +2908,9 @@
             document.getElementById('maintenanceForm').reset();
             showToast('success', 'Maintenance planifiée', `Maintenance ${ticketNumber} planifiée avec succès`);
             
-            syncData();
+            // Diffuser la maintenance aux autres administrateurs
+            broadcastMaintenanceCreated(maintenance);
+            broadcastFullSync();
         }
 
         // ============================================
@@ -2525,18 +2958,18 @@
                 const imageCount = incidentImages[incident.id]?.length || 0;
                 
                 row.innerHTML = `
-                    <td>${incident.id}</td>
-                    <td>${incident.ticketNumber}</td>
-                    <td>${incident.name}</td>
-                    <td>${incident.departmentLabel}</td>
-                    <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
-                    <td>${incident.statusLabel}</td>
-                    <td>
+                     <td>${incident.id}</td>
+                     <td>${incident.ticketNumber}</td>
+                     <td>${incident.name}</td>
+                     <td>${incident.departmentLabel}</td>
+                     <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
+                     <td>${incident.statusLabel}</td>
+                     <td>
                         ${hasImages ? 
                             `<button class="btn-info" onclick="showIncidentImages(${incident.id})">📸 ${imageCount}</button>` : 
                             '📭'}
-                    </td>
-                    <td>${formatDate(incident.createdAt)}</td>
+                     </td>
+                     <td>${formatDate(incident.createdAt)}</td>
                     <td class="actions">
                         ${incident.status !== 'resolved' && incident.status !== 'closed' ? 
                             `<button class="btn-success" onclick="updateIncidentStatus(${incident.id}, 'in-progress')">En cours</button>
@@ -2596,14 +3029,14 @@
                 }
                 
                 row.innerHTML = `
-                    <td>${maintenance.id}</td>
-                    <td>${maintenance.ticketNumber}</td>
-                    <td>${maintenance.name}</td>
-                    <td>${maintenance.departmentLabel}</td>
-                    <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
-                    <td><span class="badge ${priorityBadgeClass}">${maintenance.priorityLabel}</span></td>
-                    <td>${formatDate(maintenance.scheduledDate)}</td>
-                    <td>${maintenance.statusLabel}</td>
+                     <td>${maintenance.id}</td>
+                     <td>${maintenance.ticketNumber}</td>
+                     <td>${maintenance.name}</td>
+                     <td>${maintenance.departmentLabel}</td>
+                     <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
+                     <td><span class="badge ${priorityBadgeClass}">${maintenance.priorityLabel}</span></td>
+                     <td>${formatDate(maintenance.scheduledDate)}</td>
+                     <td>${maintenance.statusLabel}</td>
                     <td class="actions">
                         ${maintenance.status !== 'completed' && maintenance.status !== 'cancelled' ? 
                             `<button class="btn-success" onclick="updateMaintenanceStatus(${maintenance.id}, 'in-progress')">Démarrer</button>
@@ -2614,7 +3047,7 @@
                             ''}
                         <button class="btn-info" onclick="showMaintenanceDetails(${maintenance.id})">Détails</button>
                         <button class="btn-danger" onclick="deleteMaintenance(${maintenance.id})">Supprimer</button>
-                    </td>
+                     </td>
                 `;
                 
                 tbody.appendChild(row);
@@ -2646,7 +3079,7 @@
                 updateDashboard();
                 updateCharts();
                 showToast('info', 'Statut mis à jour', `L'incident ${incident.ticketNumber} est maintenant ${statusLabels[status]}`);
-                syncData();
+                broadcastIncidentUpdated(incident);
             }
         }
 
@@ -2662,7 +3095,7 @@
                 updateCalendar();
                 updateCharts();
                 showToast('info', 'Statut mis à jour', `La maintenance ${maintenance.ticketNumber} est maintenant ${statusLabels[status]}`);
-                syncData();
+                broadcastMaintenanceUpdated(maintenance);
             }
         }
 
@@ -2679,7 +3112,7 @@
                 updateDashboard();
                 updateCharts();
                 showToast('success', 'Incident supprimé', 'L\'incident a été supprimé avec succès');
-                syncData();
+                broadcastIncidentDeleted(id);
             });
         }
 
@@ -2692,7 +3125,7 @@
                 updateCalendar();
                 updateCharts();
                 showToast('success', 'Maintenance supprimée', 'La maintenance a été supprimée avec succès');
-                syncData();
+                broadcastMaintenanceDeleted(id);
             });
         }
 
@@ -2779,13 +3212,13 @@
                     }
                     
                     row.innerHTML = `
-                        <td>${incident.id}</td>
-                        <td>${incident.ticketNumber}</td>
-                        <td>${incident.name}</td>
-                        <td>${incident.departmentLabel}</td>
-                        <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
-                        <td>${incident.statusLabel}</td>
-                        <td>${formatDate(incident.createdAt)}</td>
+                         <td>${incident.id}</td>
+                         <td>${incident.ticketNumber}</td>
+                         <td>${incident.name}</td>
+                         <td>${incident.departmentLabel}</td>
+                         <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
+                         <td>${incident.statusLabel}</td>
+                         <td>${formatDate(incident.createdAt)}</td>
                     `;
                     
                     recentIncidentsTbody.appendChild(row);
@@ -2816,13 +3249,13 @@
                     }
                     
                     row.innerHTML = `
-                        <td>${maintenance.id}</td>
-                        <td>${maintenance.ticketNumber}</td>
-                        <td>${maintenance.name}</td>
-                        <td>${maintenance.departmentLabel}</td>
-                        <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
-                        <td>${maintenance.priorityLabel}</td>
-                        <td>${formatDate(maintenance.scheduledDate)}</td>
+                         <td>${maintenance.id}</td>
+                         <td>${maintenance.ticketNumber}</td>
+                         <td>${maintenance.name}</td>
+                         <td>${maintenance.departmentLabel}</td>
+                         <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
+                         <td>${maintenance.priorityLabel}</td>
+                         <td>${formatDate(maintenance.scheduledDate)}</td>
                     `;
                     
                     upcomingMaintenanceTbody.appendChild(row);
@@ -3064,7 +3497,7 @@
                 
                 showToast('success', 'Nettoyage terminé', `${incidentsBefore - incidents.length} incidents et ${maintenancesBefore - maintenances.length} maintenances ont été supprimés`);
                 
-                syncData();
+                broadcastFullSync();
             });
         }
 
@@ -3072,8 +3505,10 @@
         // SYNCHRONISATION TEMPS RÉEL
         // ============================================
         function startSyncTimer() {
-            setInterval(() => {
-                if (realtimeEnabled) {
+            if (syncTimer) clearInterval(syncTimer);
+            
+            syncTimer = setInterval(() => {
+                if (realtimeEnabled && broadcastChannel) {
                     syncData();
                 }
             }, syncInterval * 1000);
@@ -3090,23 +3525,10 @@
             updateDashboard();
             updateCalendar();
             updateCharts();
-        }
-
-        function updateRealtimeStatus() {
-            const dot = document.getElementById('realtimeDot');
-            const status = document.getElementById('realtimeStatus');
-            const syncDot = document.getElementById('syncDot');
             
-            if (!dot || !status || !syncDot) return;
-            
-            if (realtimeEnabled) {
-                dot.className = 'sync-dot';
-                status.textContent = 'Connecté - Réception des données en temps réel';
-                syncDot.className = 'sync-dot';
-            } else {
-                dot.className = 'sync-dot offline';
-                status.textContent = 'Mode temps réel désactivé';
-                syncDot.className = 'sync-dot offline';
+            // Mettre à jour le statut de connexion
+            if (broadcastChannel) {
+                updateRealtimeStatus(true);
             }
         }
 
