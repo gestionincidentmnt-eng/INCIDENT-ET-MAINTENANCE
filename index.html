@@ -582,7 +582,6 @@
             color: #666;
         }
 
-        /* Styles pour l'upload d'images et la caméra */
         .image-upload-container {
             border: 2px dashed #ccc;
             border-radius: 5px;
@@ -726,7 +725,6 @@
             font-size: 11px;
         }
 
-        /* Styles pour les graphiques */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -782,8 +780,12 @@
 
         .tab-lock-info {
             font-size: 12px;
-            color: #666;
+            color: #ff9800;
             margin-top: 5px;
+            display: inline-block;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
         }
         
         @media (max-width: 768px) {
@@ -832,7 +834,7 @@
     </style>
 </head>
 <body>
-    <!-- Lock Screen pour la protection des onglets sensibles (MOT DE PASSE MASQUÉ) -->
+    <!-- Lock Screen pour la protection des onglets sensibles -->
     <div id="protectedTabLockScreen" class="lock-screen" style="display: none;">
         <div class="lock-screen-content">
             <div class="lock-icon">🔒</div>
@@ -912,8 +914,8 @@
             <li><a href="#dashboard" class="tab-link active">📊 Tableau de bord</a></li>
             <li><a href="#incidents" class="tab-link">⚠️ Incidents</a></li>
             <li><a href="#maintenance" class="tab-link">🔧 Maintenance</a></li>
-            <li><a href="#reports" class="tab-link" id="reportsTabLink">📈 Rapports <span class="tab-lock-info">(protégé)</span></a></li>
-            <li><a href="#settings" class="tab-link" id="settingsTabLink">⚙️ Paramètres <span class="tab-lock-info">(protégé)</span></a></li>
+            <li><a href="#reports" class="tab-link" id="reportsTabLink">📈 Rapports <span class="tab-lock-info">🔒 protégé</span></a></li>
+            <li><a href="#settings" class="tab-link" id="settingsTabLink">⚙️ Paramètres <span class="tab-lock-info">🔒 protégé</span></a></li>
         </ul>
         
         <!-- ==================== TABLEAU DE BORD ==================== -->
@@ -961,7 +963,7 @@
                 <h2>📅 Maintenances à venir <span class="realtime-badge" id="upcomingMaintenanceBadge">EN DIRECT</span></h2>
                 <table id="upcomingMaintenance">
                     <thead>
-                        <tr>
+                        32fb
                             <th>ID</th>
                             <th>Ticket</th>
                             <th>Nom et Prénom</th>
@@ -1001,7 +1003,6 @@
                     <div class="ticket-date">Date: <span id="incidentTicketDate"></span></div>
                 </div>
                 
-                <!-- Message d'orientation pour les captures -->
                 <div class="info-box" style="margin-bottom: 15px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 24px;">📸</span>
@@ -1029,7 +1030,10 @@
                             <option value="dga">DGA</option>
                             <option value="dg">DG</option>
                             <option value="dcom">DCOM</option>
-                            <option value="dmg">DMG</option>
+                            <option value="daf">DAF</option>
+                            <option value="dacq">DACQ</option>
+                            <option value="cp">CP</option>
+                            <option value="dplmg">DPLMG</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1046,7 +1050,6 @@
                         </select>
                     </div>
                     
-                    <!-- Capture d'écran de l'incident -->
                     <div class="form-group">
                         <label>📸 Capture d'écran de l'incident</label>
                         <div class="image-upload-container" id="incidentImageUpload">
@@ -1056,7 +1059,6 @@
                             <input type="file" id="incidentImage" accept="image/*" style="display: none;">
                         </div>
                         
-                        <!-- Boutons pour la caméra -->
                         <div class="camera-buttons">
                             <button type="button" class="camera-button" onclick="openCamera('incident')">
                                 <span>📸</span> Prendre une photo
@@ -1066,7 +1068,6 @@
                             </button>
                         </div>
                         
-                        <!-- Aperçu de l'image -->
                         <div id="incidentImagePreview" class="image-preview"></div>
                     </div>
                     
@@ -1108,7 +1109,10 @@
                             <option value="dga">DGA</option>
                             <option value="dg">DG</option>
                             <option value="dcom">DCOM</option>
-                            <option value="dmg">DMG</option>
+                            <option value="daf">DAF</option>
+                            <option value="dacq">DACQ</option>
+                            <option value="cp">CP</option>
+                            <option value="dplmg">DPLMG</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -1123,7 +1127,7 @@
                 
                 <table id="incidentsTable">
                     <thead>
-                        <tr>
+                        32fb
                             <th>ID</th>
                             <th>Ticket</th>
                             <th>Nom et Prénom</th>
@@ -1167,7 +1171,10 @@
                             <option value="dga">DGA</option>
                             <option value="dg">DG</option>
                             <option value="dcom">DCOM</option>
-                            <option value="dmg">DMG</option>
+                            <option value="daf">DAF</option>
+                            <option value="dacq">DACQ</option>
+                            <option value="cp">CP</option>
+                            <option value="dplmg">DPLMG</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1242,14 +1249,17 @@
                             <option value="dga">DGA</option>
                             <option value="dg">DG</option>
                             <option value="dcom">DCOM</option>
-                            <option value="dmg">DMG</option>
+                            <option value="daf">DAF</option>
+                            <option value="dacq">DACQ</option>
+                            <option value="cp">CP</option>
+                            <option value="dplmg">DPLMG</option>
                         </select>
                     </div>
                 </div>
                 
                 <table id="maintenanceTable">
                     <thead>
-                        <tr>
+                        32fb
                             <th>ID</th>
                             <th>Ticket</th>
                             <th>Nom et Prénom</th>
@@ -1294,7 +1304,6 @@
                     <button id="refreshReportsBtn" class="btn-success">Actualiser les graphiques</button>
                 </div>
                 
-                <!-- Grille de graphiques -->
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>📊 Répartition des incidents par priorité</h3>
@@ -1317,7 +1326,6 @@
                     </div>
                 </div>
                 
-                <!-- Statistiques détaillées -->
                 <div class="stats" id="reportsStats">
                     <!-- Rempli dynamiquement -->
                 </div>
@@ -1329,7 +1337,7 @@
             </div>
         </div>
         
-        <!-- ==================== PARAMÈTRES (MOT DE PASSE MASQUÉ) ==================== -->
+        <!-- ==================== PARAMÈTRES ==================== -->
         <div id="settings" class="tab-content">
             <div class="card">
                 <h2>⚙️ Paramètres de l'application</h2>
@@ -1343,12 +1351,12 @@
                             <span class="password-toggle" onclick="togglePasswordVisibility('protectedTabsPassword')">👁️</span>
                         </div>
                         <small style="color: #666; display: block; margin-top: 5px;">Laissez vide pour ne pas changer</small>
+                        <small style="color: #ff9800; display: block; margin-top: 5px;">Mot de passe actuel : admin123 (modifiable)</small>
                     </div>
                     <button id="changeProtectedPassword" class="btn-warning">Changer le mot de passe</button>
                     <p style="margin-top: 10px; font-size: 12px; color: #999; font-style: italic;">
-                        ⚠️ Le mot de passe actuel n'est pas affiché pour des raisons de sécurité
+                        ⚠️ Ce mot de passe protège les onglets Rapports et Paramètres
                     </p>
-                    <p style="font-size: 12px; color: #666;">Les onglets Rapports et Paramètres sont protégés</p>
                 </div>
                 
                 <div class="data-retention">
@@ -1548,17 +1556,10 @@
         // Variables pour la caméra
         let currentStream = null;
         let currentImageType = null;
-        let currentPreviewContainer = null;
 
         // Stockage des images
         let incidentImages = JSON.parse(localStorage.getItem('incidentImages')) || {};
         let resolutionImages = JSON.parse(localStorage.getItem('resolutionImages')) || {};
-
-        // Statistiques temps réel
-        let realtimeStats = {
-            messagesReceived: 0,
-            lastUpdate: null
-        };
 
         // Graphiques du tableau de bord
         let incidentsChart, maintenanceChart;
@@ -1573,7 +1574,10 @@
             dga: "DGA",
             dg: "DG",
             dcom: "DCOM",
-            dmg: "DMG"
+            daf: "DAF",
+            dacq: "DACQ",
+            cp: "CP",
+            dplmg: "DPLMG"
         };
 
         // Priorités
@@ -1627,7 +1631,7 @@
                 if (currentTargetTab === 'reports') {
                     reportsUnlocked = true;
                     activateTab('reports');
-                    loadReportsCharts();
+                    setTimeout(() => loadReportsCharts(), 100);
                 } else if (currentTargetTab === 'settings') {
                     settingsUnlocked = true;
                     activateTab('settings');
@@ -1642,258 +1646,227 @@
             document.getElementById('protectedTabPassword').value = '';
         }
 
-        // ============================================
-        // FONCTIONS POUR LA CAMÉRA ET CAPTURES D'ÉCRAN
-        // ============================================
-        
-        // Ouvrir la caméra
-        window.openCamera = function(imageType) {
-            currentImageType = imageType;
-            const modal = document.getElementById('cameraModal');
-            modal.classList.add('show');
-            
-            // Accéder à la caméra
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    currentStream = stream;
-                    const video = document.getElementById('camera-feed');
-                    video.srcObject = stream;
-                })
-                .catch(function(error) {
-                    console.error('Erreur d\'accès à la caméra:', error);
-                    showToast('error', 'Erreur', 'Impossible d\'accéder à la caméra');
-                    closeCamera();
-                });
-        };
-        
-        // Fermer la caméra
-        window.closeCamera = function() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-            document.getElementById('cameraModal').classList.remove('show');
-        };
-        
-        // Prendre une photo
-        window.capturePhoto = function() {
-            const video = document.getElementById('camera-feed');
-            const canvas = document.getElementById('camera-canvas');
-            const context = canvas.getContext('2d');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Convertir en data URL
-            const imageData = canvas.toDataURL('image/png');
-            
-            // Ajouter l'image à l'aperçu
-            const previewContainer = document.getElementById(currentImageType + 'ImagePreview');
-            addImageToPreview(imageData, previewContainer, currentImageType);
-            
-            // Fermer la caméra
-            closeCamera();
-            
-            showToast('success', 'Photo prise', 'La photo a été ajoutée avec succès');
-        };
-        
-        // Capture d'écran
-        window.captureScreen = function(imageType) {
-            // Vérifier si l'API de capture d'écran est disponible
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                navigator.mediaDevices.getDisplayMedia({ video: true })
-                    .then(function(stream) {
-                        const video = document.createElement('video');
-                        video.srcObject = stream;
-                        video.onloadedmetadata = function() {
-                            video.play();
-                            
-                            const canvas = document.createElement('canvas');
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            const context = canvas.getContext('2d');
-                            
-                            setTimeout(() => {
-                                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                const imageData = canvas.toDataURL('image/png');
-                                
-                                // Ajouter l'image à l'aperçu
-                                const previewContainer = document.getElementById(imageType + 'ImagePreview');
-                                addImageToPreview(imageData, previewContainer, imageType);
-                                
-                                // Arrêter le flux
-                                stream.getTracks().forEach(track => track.stop());
-                                
-                                showToast('success', 'Capture d\'écran', 'La capture a été ajoutée avec succès');
-                            }, 500);
-                        };
-                    })
-                    .catch(function(error) {
-                        console.error('Erreur de capture d\'écran:', error);
-                        showToast('error', 'Erreur', 'Impossible de capturer l\'écran');
-                    });
-            } else {
-                showToast('error', 'Non supporté', 'La capture d\'écran n\'est pas supportée par votre navigateur');
-            }
-        };
-        
-        // Fonction pour ajouter une image à l'aperçu
-        function addImageToPreview(imageData, previewContainer, imageType, incidentId = null) {
-            const previewDiv = document.createElement('div');
-            previewDiv.className = 'image-preview-item';
-            previewDiv.innerHTML = `
-                <img src="${imageData}" alt="Aperçu" onclick="zoomImage('${imageData}')" style="cursor: pointer;">
-                <button class="remove-image" onclick="removeImage(this, '${imageType}', '${incidentId || ''}')">×</button>
-            `;
-            
-            previewContainer.innerHTML = '';
-            previewContainer.appendChild(previewDiv);
-
-            if (incidentId) {
-                if (imageType === 'incident') {
-                    if (!incidentImages[incidentId]) incidentImages[incidentId] = [];
-                    incidentImages[incidentId].push(imageData);
-                } else if (imageType === 'resolution') {
-                    if (!resolutionImages[incidentId]) resolutionImages[incidentId] = [];
-                    resolutionImages[incidentId].push(imageData);
-                }
-                saveImages();
-            }
+        function cancelProtectedTabUnlock() {
+            document.getElementById('protectedTabLockScreen').style.display = 'none';
+            currentTargetTab = null;
+            // Rester sur l'onglet actif
         }
 
         // ============================================
-        // GESTION DES IMAGES
+        // INITIALISATION
         // ============================================
-        function setupImageUpload(uploadId, previewId, inputId, imageType, incidentId = null) {
-            const uploadArea = document.getElementById(uploadId);
-            const fileInput = document.getElementById(inputId);
-            const previewContainer = document.getElementById(previewId);
-
-            if (!uploadArea || !fileInput) return;
-
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
-            });
-
-            uploadArea.addEventListener('dragover', (e) => {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestionnaire de connexion
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                uploadArea.style.borderColor = 'var(--secondary)';
-                uploadArea.style.background = '#e8f4fd';
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                login(username, password);
             });
+            
+            // Initialisation
+            initializeTabs();
+            setupEventListeners();
+            updateRetentionInfo();
+            applyRetentionPolicy();
+            initReportsCharts();
+            
+            // Restaurer les préférences
+            document.getElementById('emailNotifications').checked = emailNotifications;
+            document.getElementById('desktopNotifications').checked = desktopNotifications;
+            
+            // Setup image uploads
+            setupImageUpload('incidentImageUpload', 'incidentImagePreview', 'incidentImage', 'incident');
+        });
 
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = '#ccc';
-                uploadArea.style.background = '#f9f9f9';
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#ccc';
-                uploadArea.style.background = '#f9f9f9';
+        // ============================================
+        // FONCTION DE CONNEXION
+        // ============================================
+        function login(username, password) {
+            if (username === defaultUser.username && password === defaultUser.password) {
+                currentUser = defaultUser;
+                defaultUser.lastLogin = new Date().toISOString();
                 
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleImageUpload(files[0], previewContainer, imageType, incidentId);
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                
+                document.getElementById('userName').textContent = defaultUser.fullname;
+                document.getElementById('userAvatar').textContent = defaultUser.avatar;
+                
+                // Charger les données
+                loadIncidents();
+                loadMaintenances();
+                updateDashboard();
+                updateCalendar();
+                updateTicketNumbers();
+                updateRealtimeStatus();
+                startSyncTimer();
+                initCharts();
+                
+                showToast('success', 'Connexion réussie', `Bienvenue ${defaultUser.fullname}`);
+            } else {
+                showToast('error', 'Erreur de connexion', 'Nom d\'utilisateur ou mot de passe incorrect');
+            }
+        }
+
+        // ============================================
+        // INITIALISATION DES ONGLETS
+        // ============================================
+        function initializeTabs() {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href').substring(1);
+                    
+                    // Vérification des onglets protégés
+                    if (target === 'reports' && !reportsUnlocked) {
+                        showProtectedTabLock('reports');
+                        return;
+                    }
+                    
+                    if (target === 'settings' && !settingsUnlocked) {
+                        showProtectedTabLock('settings');
+                        return;
+                    }
+                    
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(target).classList.add('active');
+                    
+                    if (target === 'incidents' || target === 'maintenance') {
+                        updateTicketNumbers();
+                    }
+                    if (target === 'maintenance') {
+                        updateCalendar();
+                    }
+                    if (target === 'dashboard') {
+                        updateCharts();
+                    }
+                });
+            });
+        }
+
+        function activateTab(tabName) {
+            const tabLink = document.querySelector(`a[href="#${tabName}"]`);
+            if (tabLink) {
+                tabLink.click();
+            }
+        }
+
+        // ============================================
+        // CONFIGURATION DES ÉCOUTEURS
+        // ============================================
+        function setupEventListeners() {
+            // Protection des onglets
+            document.getElementById('unlockProtectedTabBtn')?.addEventListener('click', unlockProtectedTab);
+            document.getElementById('cancelProtectedTabUnlockBtn')?.addEventListener('click', cancelProtectedTabUnlock);
+            
+            // Changement mot de passe protection
+            document.getElementById('changeProtectedPassword')?.addEventListener('click', function() {
+                const newPassword = document.getElementById('protectedTabsPassword').value;
+                if (newPassword) {
+                    if (newPassword.length < 4) {
+                        showToast('error', 'Erreur', 'Le mot de passe doit contenir au moins 4 caractères');
+                        return;
+                    }
+                    protectedTabsPassword = newPassword;
+                    localStorage.setItem('protectedTabsPassword', newPassword);
+                    showToast('success', 'Mot de passe modifié', 'Le mot de passe de protection a été mis à jour');
+                    document.getElementById('protectedTabsPassword').value = '';
+                } else {
+                    showToast('error', 'Erreur', 'Veuillez entrer un nouveau mot de passe');
                 }
             });
+            
+            // Formulaires
+            document.getElementById('incidentForm')?.addEventListener('submit', createIncident);
+            document.getElementById('maintenanceForm')?.addEventListener('submit', createMaintenance);
+            
+            // Filtres
+            document.getElementById('filterStatus')?.addEventListener('change', filterIncidents);
+            document.getElementById('filterPriority')?.addEventListener('change', filterIncidents);
+            document.getElementById('filterDepartment')?.addEventListener('change', filterIncidents);
+            document.getElementById('filterImage')?.addEventListener('change', filterIncidents);
+            
+            document.getElementById('filterMaintenanceType')?.addEventListener('change', filterMaintenances);
+            document.getElementById('filterMaintenanceStatus')?.addEventListener('change', filterMaintenances);
+            document.getElementById('filterMaintenanceDepartment')?.addEventListener('change', filterMaintenances);
+            
+            // Rapports
+            document.getElementById('refreshReportsBtn')?.addEventListener('click', loadReportsCharts);
+            document.getElementById('exportReportsChart')?.addEventListener('click', exportReportsCharts);
+            document.getElementById('exportReportsData')?.addEventListener('click', exportReportsData);
+            
+            // Exports
+            document.getElementById('exportExcelBtn')?.addEventListener('click', exportAllToExcel);
+            
+            // Rétention
+            document.getElementById('applyRetention')?.addEventListener('click', function() {
+                retentionPeriod = parseInt(document.getElementById('retentionPeriod').value);
+                localStorage.setItem('retentionPeriod', retentionPeriod);
+                applyRetentionPolicy();
+                showToast('success', 'Paramètres enregistrés', 'La politique de conservation a été mise à jour');
+            });
+            
+            document.getElementById('cleanOldData')?.addEventListener('click', cleanOldData);
+            
+            // Synchronisation
+            document.getElementById('syncNow')?.addEventListener('click', syncData);
+            document.getElementById('syncInterval')?.addEventListener('change', function() {
+                syncInterval = parseInt(this.value);
+                localStorage.setItem('syncInterval', syncInterval);
+                startSyncTimer();
+            });
 
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageUpload(e.target.files[0], previewContainer, imageType, incidentId);
+            document.getElementById('realtimeEnabled')?.addEventListener('change', function() {
+                realtimeEnabled = this.value === 'true';
+                localStorage.setItem('realtimeEnabled', realtimeEnabled);
+                updateRealtimeStatus();
+                if (realtimeEnabled) {
+                    startSyncTimer();
                 }
             });
-        }
-
-        function handleImageUpload(file, previewContainer, imageType, incidentId) {
-            if (!file.type.startsWith('image/')) {
-                showToast('error', 'Erreur', 'Veuillez sélectionner une image');
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('error', 'Erreur', 'L\'image ne doit pas dépasser 5 Mo');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageData = e.target.result;
-                addImageToPreview(imageData, previewContainer, imageType, incidentId);
-                showToast('success', 'Image ajoutée', 'La capture a été téléchargée avec succès');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        window.removeImage = function(button, imageType, incidentId) {
-            const previewDiv = button.closest('.image-preview-item');
-            previewDiv.remove();
-
-            if (incidentId) {
-                if (imageType === 'incident') {
-                    delete incidentImages[incidentId];
-                } else if (imageType === 'resolution') {
-                    delete resolutionImages[incidentId];
+            
+            // Notifications
+            document.getElementById('emailNotifications')?.addEventListener('change', function() {
+                emailNotifications = this.checked;
+                localStorage.setItem('emailNotifications', emailNotifications);
+            });
+            
+            document.getElementById('desktopNotifications')?.addEventListener('change', function() {
+                desktopNotifications = this.checked;
+                localStorage.setItem('desktopNotifications', desktopNotifications);
+                if (desktopNotifications && Notification.permission !== 'granted') {
+                    Notification.requestPermission();
                 }
-                saveImages();
-            }
-        };
-
-        function saveImages() {
-            localStorage.setItem('incidentImages', JSON.stringify(incidentImages));
-            localStorage.setItem('resolutionImages', JSON.stringify(resolutionImages));
+            });
+            
+            // Modales
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('show');
+                });
+            });
+            
+            // Déconnexion
+            document.getElementById('logoutBtn')?.addEventListener('click', function() {
+                showConfirm('Êtes-vous sûr de vouloir vous déconnecter ?', function() {
+                    currentUser = null;
+                    reportsUnlocked = false;
+                    settingsUnlocked = false;
+                    document.getElementById('mainApp').style.display = 'none';
+                    document.getElementById('loginModal').style.display = 'flex';
+                    document.getElementById('loginPassword').value = 'Admin@123';
+                    document.getElementById('loginUsername').value = 'admin';
+                });
+            });
         }
-
-        window.showIncidentImages = function(incidentId) {
-            const modal = document.getElementById('imageViewModal');
-            const container = document.getElementById('modalImages');
-            
-            let html = '';
-            
-            // Images de l'incident
-            if (incidentImages[incidentId]) {
-                incidentImages[incidentId].forEach((img, index) => {
-                    html += `
-                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
-                            <div class="image-label" style="background: var(--warning);">📸 Incident ${index + 1}</div>
-                            <img src="${img}" alt="Image incident">
-                        </div>
-                    `;
-                });
-            }
-            
-            // Images de résolution
-            if (resolutionImages[incidentId]) {
-                resolutionImages[incidentId].forEach((img, index) => {
-                    html += `
-                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
-                            <div class="image-label" style="background: var(--success);">✅ Résolution ${index + 1}</div>
-                            <img src="${img}" alt="Image résolution">
-                        </div>
-                    `;
-                });
-            }
-            
-            if (html === '') {
-                html = '<p class="text-center">Aucune capture pour cet incident</p>';
-            }
-            
-            container.innerHTML = html;
-            modal.classList.add('show');
-        };
-
-        window.zoomImage = function(imgSrc) {
-            const modal = document.getElementById('imageViewModal');
-            const container = document.getElementById('modalImages');
-            
-            container.innerHTML = `
-                <div style="text-align: center;">
-                    <img src="${imgSrc}" style="max-width: 100%; max-height: 70vh; border-radius: 5px;">
-                </div>
-            `;
-            
-            modal.classList.add('show');
-        };
 
         // ============================================
         // FONCTIONS POUR LES GRAPHIQUES DE RAPPORTS
@@ -2027,24 +2000,26 @@
             
             // Mise à jour des statistiques
             const statsDiv = document.getElementById('reportsStats');
-            statsDiv.innerHTML = `
-                <div class="stat-card">
-                    <h3>Incidents (période)</h3>
-                    <p>${filteredIncidents.length}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Maintenances (période)</h3>
-                    <p>${filteredMaintenances.length}</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Taux résolution</h3>
-                    <p>${filteredIncidents.length > 0 ? Math.round((filteredIncidents.filter(i => i.status === 'resolved' || i.status === 'closed').length / filteredIncidents.length) * 100) : 0}%</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Critiques</h3>
-                    <p>${filteredIncidents.filter(i => i.priority === 'critical').length}</p>
-                </div>
-            `;
+            if (statsDiv) {
+                statsDiv.innerHTML = `
+                    <div class="stat-card">
+                        <h3>Incidents (période)</h3>
+                        <p>${filteredIncidents.length}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Maintenances (période)</h3>
+                        <p>${filteredMaintenances.length}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Taux résolution</h3>
+                        <p>${filteredIncidents.length > 0 ? Math.round((filteredIncidents.filter(i => i.status === 'resolved' || i.status === 'closed').length / filteredIncidents.length) * 100) : 0}%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Critiques</h3>
+                        <p>${filteredIncidents.filter(i => i.priority === 'critical').length}</p>
+                    </div>
+                `;
+            }
             
             // Mise à jour graphique priorité
             if (reportsPriorityChart) {
@@ -2111,226 +2086,6 @@
         }
 
         // ============================================
-        // INITIALISATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestionnaire de connexion
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = document.getElementById('loginUsername').value;
-                const password = document.getElementById('loginPassword').value;
-                login(username, password);
-            });
-            
-            // Initialisation
-            initializeTabs();
-            setupEventListeners();
-            updateRetentionInfo();
-            applyRetentionPolicy();
-            initReportsCharts();
-            
-            // Restaurer les préférences
-            document.getElementById('emailNotifications').checked = emailNotifications;
-            document.getElementById('desktopNotifications').checked = desktopNotifications;
-            
-            // Setup image uploads
-            setupImageUpload('incidentImageUpload', 'incidentImagePreview', 'incidentImage', 'incident');
-        });
-
-        // ============================================
-        // FONCTION DE CONNEXION
-        // ============================================
-        function login(username, password) {
-            if (username === defaultUser.username && password === defaultUser.password) {
-                currentUser = defaultUser;
-                defaultUser.lastLogin = new Date().toISOString();
-                
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
-                document.getElementById('userName').textContent = defaultUser.fullname;
-                document.getElementById('userAvatar').textContent = defaultUser.avatar;
-                
-                // Charger les données
-                loadIncidents();
-                loadMaintenances();
-                updateDashboard();
-                updateCalendar();
-                updateTicketNumbers();
-                updateRealtimeStatus();
-                startSyncTimer();
-                initCharts();
-                
-                showToast('success', 'Connexion réussie', `Bienvenue ${defaultUser.fullname}`);
-            } else {
-                showToast('error', 'Erreur de connexion', 'Nom d\'utilisateur ou mot de passe incorrect');
-            }
-        }
-
-        // ============================================
-        // INITIALISATION DES ONGLETS
-        // ============================================
-        function initializeTabs() {
-            const tabLinks = document.querySelectorAll('.tab-link');
-            
-            tabLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = this.getAttribute('href').substring(1);
-                    
-                    // Vérification des onglets protégés
-                    if (target === 'reports' && !reportsUnlocked) {
-                        showProtectedTabLock('reports');
-                        return;
-                    }
-                    
-                    if (target === 'settings' && !settingsUnlocked) {
-                        showProtectedTabLock('settings');
-                        return;
-                    }
-                    
-                    tabLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(target).classList.add('active');
-                    
-                    if (target === 'incidents' || target === 'maintenance') {
-                        updateTicketNumbers();
-                    }
-                    if (target === 'maintenance') {
-                        updateCalendar();
-                    }
-                    if (target === 'dashboard') {
-                        updateCharts();
-                    }
-                });
-            });
-        }
-
-        function activateTab(tabName) {
-            const tabLink = document.querySelector(`a[href="#${tabName}"]`);
-            if (tabLink) {
-                tabLink.click();
-            }
-        }
-
-        // ============================================
-        // CONFIGURATION DES ÉCOUTEURS
-        // ============================================
-        function setupEventListeners() {
-            // Protection des onglets
-            document.getElementById('unlockProtectedTabBtn')?.addEventListener('click', unlockProtectedTab);
-            document.getElementById('cancelProtectedTabUnlockBtn')?.addEventListener('click', function() {
-                document.getElementById('protectedTabLockScreen').style.display = 'none';
-                currentTargetTab = null;
-                activateTab('dashboard');
-            });
-            
-            // Changement mot de passe protection (sans afficher l'ancien)
-            document.getElementById('changeProtectedPassword')?.addEventListener('click', function() {
-                const newPassword = document.getElementById('protectedTabsPassword').value;
-                if (newPassword) {
-                    if (newPassword.length < 4) {
-                        showToast('error', 'Erreur', 'Le mot de passe doit contenir au moins 4 caractères');
-                        return;
-                    }
-                    protectedTabsPassword = newPassword;
-                    localStorage.setItem('protectedTabsPassword', newPassword);
-                    showToast('success', 'Mot de passe modifié', 'Le mot de passe de protection a été mis à jour');
-                    document.getElementById('protectedTabsPassword').value = '';
-                } else {
-                    showToast('error', 'Erreur', 'Veuillez entrer un nouveau mot de passe');
-                }
-            });
-            
-            // Formulaires
-            document.getElementById('incidentForm')?.addEventListener('submit', createIncident);
-            document.getElementById('maintenanceForm')?.addEventListener('submit', createMaintenance);
-            
-            // Filtres
-            document.getElementById('filterStatus')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterPriority')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterDepartment')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterImage')?.addEventListener('change', filterIncidents);
-            
-            document.getElementById('filterMaintenanceType')?.addEventListener('change', filterMaintenances);
-            document.getElementById('filterMaintenanceStatus')?.addEventListener('change', filterMaintenances);
-            document.getElementById('filterMaintenanceDepartment')?.addEventListener('change', filterMaintenances);
-            
-            // Rapports
-            document.getElementById('refreshReportsBtn')?.addEventListener('click', loadReportsCharts);
-            document.getElementById('exportReportsChart')?.addEventListener('click', exportReportsCharts);
-            document.getElementById('exportReportsData')?.addEventListener('click', exportReportsData);
-            
-            // Exports
-            document.getElementById('exportExcelBtn')?.addEventListener('click', exportAllToExcel);
-            
-            // Rétention
-            document.getElementById('applyRetention')?.addEventListener('click', function() {
-                retentionPeriod = parseInt(document.getElementById('retentionPeriod').value);
-                localStorage.setItem('retentionPeriod', retentionPeriod);
-                applyRetentionPolicy();
-                showToast('success', 'Paramètres enregistrés', 'La politique de conservation a été mise à jour');
-            });
-            
-            document.getElementById('cleanOldData')?.addEventListener('click', cleanOldData);
-            
-            // Synchronisation
-            document.getElementById('syncNow')?.addEventListener('click', syncData);
-            document.getElementById('syncInterval')?.addEventListener('change', function() {
-                syncInterval = parseInt(this.value);
-                localStorage.setItem('syncInterval', syncInterval);
-                startSyncTimer();
-            });
-
-            document.getElementById('realtimeEnabled')?.addEventListener('change', function() {
-                realtimeEnabled = this.value === 'true';
-                localStorage.setItem('realtimeEnabled', realtimeEnabled);
-                updateRealtimeStatus();
-                if (realtimeEnabled) {
-                    startSyncTimer();
-                }
-            });
-            
-            // Notifications
-            document.getElementById('emailNotifications')?.addEventListener('change', function() {
-                emailNotifications = this.checked;
-                localStorage.setItem('emailNotifications', emailNotifications);
-            });
-            
-            document.getElementById('desktopNotifications')?.addEventListener('change', function() {
-                desktopNotifications = this.checked;
-                localStorage.setItem('desktopNotifications', desktopNotifications);
-                if (desktopNotifications && Notification.permission !== 'granted') {
-                    Notification.requestPermission();
-                }
-            });
-            
-            // Modales
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.closest('.modal').classList.remove('show');
-                });
-            });
-            
-            // Déconnexion
-            document.getElementById('logoutBtn')?.addEventListener('click', function() {
-                showConfirm('Êtes-vous sûr de vouloir vous déconnecter ?', function() {
-                    currentUser = null;
-                    reportsUnlocked = false;
-                    settingsUnlocked = false;
-                    document.getElementById('mainApp').style.display = 'none';
-                    document.getElementById('loginModal').style.display = 'flex';
-                    document.getElementById('loginPassword').value = 'Admin@123';
-                    document.getElementById('loginUsername').value = 'admin';
-                });
-            });
-        }
-
-        // ============================================
         // EXPORTS DES GRAPHIQUES
         // ============================================
         
@@ -2355,13 +2110,6 @@
             const filteredIncidents = incidents.filter(i => new Date(i.createdAt) >= startDate);
             const filteredMaintenances = maintenances.filter(m => new Date(m.createdAt) >= startDate);
             
-            const data = {
-                incidents: filteredIncidents,
-                maintenances: filteredMaintenances,
-                period: period === 'all' ? 'Toutes les données' : `${period} jours`,
-                generatedAt: new Date().toISOString()
-            };
-            
             const wb = XLSX.utils.book_new();
             
             const incidentsSheet = XLSX.utils.json_to_sheet(filteredIncidents);
@@ -2375,6 +2123,245 @@
             
             showToast('success', 'Export réussi', 'Les données du rapport ont été exportées');
         }
+
+        // ============================================
+        // GESTION DES IMAGES
+        // ============================================
+        function setupImageUpload(uploadId, previewId, inputId, imageType, incidentId = null) {
+            const uploadArea = document.getElementById(uploadId);
+            const fileInput = document.getElementById(inputId);
+            const previewContainer = document.getElementById(previewId);
+
+            if (!uploadArea || !fileInput) return;
+
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--secondary)';
+                uploadArea.style.background = '#e8f4fd';
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#ccc';
+                uploadArea.style.background = '#f9f9f9';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                uploadArea.style.background = '#f9f9f9';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageUpload(files[0], previewContainer, imageType, incidentId);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImageUpload(e.target.files[0], previewContainer, imageType, incidentId);
+                }
+            });
+        }
+
+        function handleImageUpload(file, previewContainer, imageType, incidentId) {
+            if (!file.type.startsWith('image/')) {
+                showToast('error', 'Erreur', 'Veuillez sélectionner une image');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('error', 'Erreur', 'L\'image ne doit pas dépasser 5 Mo');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                addImageToPreview(imageData, previewContainer, imageType, incidentId);
+                showToast('success', 'Image ajoutée', 'La capture a été téléchargée avec succès');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addImageToPreview(imageData, previewContainer, imageType, incidentId = null) {
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview-item';
+            previewDiv.innerHTML = `
+                <img src="${imageData}" alt="Aperçu" onclick="zoomImage('${imageData}')" style="cursor: pointer;">
+                <button class="remove-image" onclick="removeImage(this, '${imageType}', '${incidentId || ''}')">×</button>
+            `;
+            
+            previewContainer.innerHTML = '';
+            previewContainer.appendChild(previewDiv);
+
+            if (incidentId) {
+                if (imageType === 'incident') {
+                    if (!incidentImages[incidentId]) incidentImages[incidentId] = [];
+                    incidentImages[incidentId].push(imageData);
+                } else if (imageType === 'resolution') {
+                    if (!resolutionImages[incidentId]) resolutionImages[incidentId] = [];
+                    resolutionImages[incidentId].push(imageData);
+                }
+                saveImages();
+            }
+        }
+
+        window.removeImage = function(button, imageType, incidentId) {
+            const previewDiv = button.closest('.image-preview-item');
+            previewDiv.remove();
+
+            if (incidentId) {
+                if (imageType === 'incident') {
+                    delete incidentImages[incidentId];
+                } else if (imageType === 'resolution') {
+                    delete resolutionImages[incidentId];
+                }
+                saveImages();
+            }
+        };
+
+        function saveImages() {
+            localStorage.setItem('incidentImages', JSON.stringify(incidentImages));
+            localStorage.setItem('resolutionImages', JSON.stringify(resolutionImages));
+        }
+
+        window.showIncidentImages = function(incidentId) {
+            const modal = document.getElementById('imageViewModal');
+            const container = document.getElementById('modalImages');
+            
+            let html = '';
+            
+            if (incidentImages[incidentId]) {
+                incidentImages[incidentId].forEach((img, index) => {
+                    html += `
+                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
+                            <div class="image-label" style="background: var(--warning);">📸 Incident ${index + 1}</div>
+                            <img src="${img}" alt="Image incident">
+                        </div>
+                    `;
+                });
+            }
+            
+            if (resolutionImages[incidentId]) {
+                resolutionImages[incidentId].forEach((img, index) => {
+                    html += `
+                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
+                            <div class="image-label" style="background: var(--success);">✅ Résolution ${index + 1}</div>
+                            <img src="${img}" alt="Image résolution">
+                        </div>
+                    `;
+                });
+            }
+            
+            if (html === '') {
+                html = '<p style="text-align: center; padding: 20px;">Aucune capture pour cet incident</p>';
+            }
+            
+            container.innerHTML = html;
+            modal.classList.add('show');
+        };
+
+        window.zoomImage = function(imgSrc) {
+            const modal = document.getElementById('imageViewModal');
+            const container = document.getElementById('modalImages');
+            
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${imgSrc}" style="max-width: 100%; max-height: 70vh; border-radius: 5px;">
+                </div>
+            `;
+            
+            modal.classList.add('show');
+        };
+
+        // ============================================
+        // FONCTIONS POUR LA CAMÉRA ET CAPTURES D'ÉCRAN
+        // ============================================
+        
+        window.openCamera = function(imageType) {
+            currentImageType = imageType;
+            const modal = document.getElementById('cameraModal');
+            modal.classList.add('show');
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    currentStream = stream;
+                    const video = document.getElementById('camera-feed');
+                    video.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error('Erreur d\'accès à la caméra:', error);
+                    showToast('error', 'Erreur', 'Impossible d\'accéder à la caméra');
+                    closeCamera();
+                });
+        };
+        
+        window.closeCamera = function() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            document.getElementById('cameraModal').classList.remove('show');
+        };
+        
+        window.capturePhoto = function() {
+            const video = document.getElementById('camera-feed');
+            const canvas = document.getElementById('camera-canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = canvas.toDataURL('image/png');
+            
+            const previewContainer = document.getElementById(currentImageType + 'ImagePreview');
+            addImageToPreview(imageData, previewContainer, currentImageType);
+            
+            closeCamera();
+            
+            showToast('success', 'Photo prise', 'La photo a été ajoutée avec succès');
+        };
+        
+        window.captureScreen = function(imageType) {
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                navigator.mediaDevices.getDisplayMedia({ video: true })
+                    .then(function(stream) {
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.onloadedmetadata = function() {
+                            video.play();
+                            
+                            const canvas = document.createElement('canvas');
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            const context = canvas.getContext('2d');
+                            
+                            setTimeout(() => {
+                                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                const imageData = canvas.toDataURL('image/png');
+                                
+                                const previewContainer = document.getElementById(imageType + 'ImagePreview');
+                                addImageToPreview(imageData, previewContainer, imageType);
+                                
+                                stream.getTracks().forEach(track => track.stop());
+                                
+                                showToast('success', 'Capture d\'écran', 'La capture a été ajoutée avec succès');
+                            }, 500);
+                        };
+                    })
+                    .catch(function(error) {
+                        console.error('Erreur de capture d\'écran:', error);
+                        showToast('error', 'Erreur', 'Impossible de capturer l\'écran');
+                    });
+            } else {
+                showToast('error', 'Non supporté', 'La capture d\'écran n\'est pas supportée par votre navigateur');
+            }
+        };
 
         // ============================================
         // CRÉATION D'INCIDENT
@@ -2411,7 +2398,6 @@
             nextIncidentId++;
             nextIncidentTicket++;
             
-            // Sauvegarder l'image associée
             const previewContainer = document.getElementById('incidentImagePreview');
             if (previewContainer.children.length > 0) {
                 const img = previewContainer.querySelector('img');
@@ -2419,7 +2405,7 @@
                     if (!incidentImages[incidentId]) incidentImages[incidentId] = [];
                     incidentImages[incidentId].push(img.src);
                 }
-                showToast('success', 'Capture sauvegardée', 'La capture d\'écran a été enregistrée');
+                showToast('success', 'Capture sauvegardée', 'La capture a été enregistrée');
             }
             
             saveIncidents();
@@ -2434,7 +2420,6 @@
             
             showToast('success', 'Incident créé', `Incident ${ticketNumber} créé avec succès`);
             
-            // Notification desktop
             if (desktopNotifications && Notification.permission === 'granted') {
                 new Notification('Nouvel incident', {
                     body: `${ticketNumber} - ${description.substring(0, 50)}...`,
@@ -2548,7 +2533,7 @@
                     <td>${incident.statusLabel}</td>
                     <td>
                         ${hasImages ? 
-                            `<button class="btn-info btn-sm" onclick="showIncidentImages(${incident.id})">📸 ${imageCount}</button>` : 
+                            `<button class="btn-info" onclick="showIncidentImages(${incident.id})">📸 ${imageCount}</button>` : 
                             '📭'}
                     </td>
                     <td>${formatDate(incident.createdAt)}</td>
@@ -2650,7 +2635,7 @@
         // ============================================
         // MISES À JOUR DE STATUT
         // ============================================
-        function updateIncidentStatus(id, status) {
+        window.updateIncidentStatus = function(id, status) {
             const incident = incidents.find(i => i.id === id);
             if (incident) {
                 incident.status = status;
@@ -2665,7 +2650,7 @@
             }
         }
 
-        function updateMaintenanceStatus(id, status) {
+        window.updateMaintenanceStatus = function(id, status) {
             const maintenance = maintenances.find(m => m.id === id);
             if (maintenance) {
                 maintenance.status = status;
@@ -2684,7 +2669,7 @@
         // ============================================
         // SUPPRESSIONS
         // ============================================
-        function deleteIncident(id) {
+        window.deleteIncident = function(id) {
             showConfirm('Êtes-vous sûr de vouloir supprimer cet incident ?', function() {
                 incidents = incidents.filter(i => i.id !== id);
                 delete incidentImages[id];
@@ -2698,7 +2683,7 @@
             });
         }
 
-        function deleteMaintenance(id) {
+        window.deleteMaintenance = function(id) {
             showConfirm('Êtes-vous sûr de vouloir supprimer cette maintenance ?', function() {
                 maintenances = maintenances.filter(m => m.id !== id);
                 saveMaintenances();
@@ -2732,7 +2717,7 @@
                 <p><strong>Date création:</strong> ${formatDate(incident.createdAt)}</p>
                 <p><strong>Dernière mise à jour:</strong> ${formatDate(incident.updatedAt)}</p>
                 ${hasImages ? 
-                    `<p><strong>Images:</strong> <button class="btn-info btn-sm" onclick="showIncidentImages(${id})">Voir les images (${incidentImages[id].length})</button></p>` : 
+                    `<p><strong>Images:</strong> <button class="btn-info" onclick="showIncidentImages(${id})">Voir les images (${incidentImages[id].length})</button></p>` : 
                     ''}
             `;
             document.getElementById('detailModal').classList.add('show');
@@ -3090,7 +3075,6 @@
             setInterval(() => {
                 if (realtimeEnabled) {
                     syncData();
-                    simulateRealtimeUpdate();
                 }
             }, syncInterval * 1000);
         }
@@ -3106,16 +3090,6 @@
             updateDashboard();
             updateCalendar();
             updateCharts();
-        }
-
-        function simulateRealtimeUpdate() {
-            if (!realtimeEnabled) return;
-            
-            realtimeStats.messagesReceived++;
-            realtimeStats.lastUpdate = new Date().toISOString();
-            
-            document.getElementById('realtimeReceived').textContent = realtimeStats.messagesReceived;
-            document.getElementById('realtimeLastUpdate').textContent = formatDate(realtimeStats.lastUpdate);
         }
 
         function updateRealtimeStatus() {
@@ -3210,20 +3184,6 @@
                 input.type = 'password';
             }
         }
-
-        // Exposer les fonctions globales
-        window.updateIncidentStatus = updateIncidentStatus;
-        window.updateMaintenanceStatus = updateMaintenanceStatus;
-        window.deleteIncident = deleteIncident;
-        window.deleteMaintenance = deleteMaintenance;
-        window.togglePasswordVisibility = togglePasswordVisibility;
-        window.removeImage = removeImage;
-        window.showIncidentImages = showIncidentImages;
-        window.zoomImage = zoomImage;
-        window.openCamera = openCamera;
-        window.closeCamera = closeCamera;
-        window.capturePhoto = capturePhoto;
-        window.captureScreen = captureScreen;
     </script>
 </body>
 </html>
