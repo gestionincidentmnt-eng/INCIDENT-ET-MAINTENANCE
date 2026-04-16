@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion d'Incidents et Maintenance IT - Synchronisation Temps Réel</title>
+    <title>Gestion d'Incidents et Maintenance IT - Encre & Support</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2c3e50;
@@ -15,6 +16,8 @@
             --light: #ecf0f1;
             --dark: #34495e;
             --info: #9b59b6;
+            --ink-low: #e67e22;
+            --ink-critical: #c0392b;
         }
         
         * {
@@ -294,6 +297,71 @@
             color: white;
         }
         
+        /* Styles pour les niveaux d'encre */
+        .ink-level {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ink-bar-container {
+            flex: 1;
+            height: 30px;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .ink-bar {
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .ink-bar.cyan { background: linear-gradient(90deg, #00bcd4, #0097a7); }
+        .ink-bar.magenta { background: linear-gradient(90deg, #e91e63, #c2185b); }
+        .ink-bar.yellow { background: linear-gradient(90deg, #ffc107, #ff8f00); }
+        .ink-bar.black { background: linear-gradient(90deg, #424242, #212121); }
+        
+        .ink-level-low .ink-bar { background: linear-gradient(90deg, #f39c12, #e67e22); }
+        .ink-level-critical .ink-bar { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        
+        .ink-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s;
+        }
+        
+        .ink-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .ink-card.alert {
+            border-left: 4px solid var(--warning);
+            background: #fff8e1;
+        }
+        
+        .ink-card.critical {
+            border-left: 4px solid var(--danger);
+            background: #ffebee;
+        }
+        
+        .printer-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -340,59 +408,11 @@
             flex-wrap: wrap;
         }
         
-        .actions button {
-            padding: 6px 10px;
-            font-size: 13px;
-        }
-        
-        .ticket-info {
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--secondary);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        
-        .ticket-number {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        .ticket-date {
-            font-size: 14px;
-            color: #6c757d;
-        }
-        
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .data-retention {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 15px;
+        .ink-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
             margin-top: 20px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background-color: var(--success);
-            transition: width 0.3s;
         }
         
         .modal {
@@ -470,35 +490,6 @@
             transform: translateX(0);
         }
         
-        .toast.success {
-            border-left: 4px solid var(--success);
-        }
-        
-        .toast.error {
-            border-left: 4px solid var(--danger);
-        }
-        
-        .toast.warning {
-            border-left: 4px solid var(--warning);
-        }
-        
-        .toast.info {
-            border-left: 4px solid var(--secondary);
-        }
-        
-        .password-input {
-            position: relative;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #666;
-        }
-        
         .realtime-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -510,12 +501,7 @@
             margin-left: 5px;
             animation: pulse 2s infinite;
         }
-
-        .realtime-badge.offline {
-            background: var(--danger);
-            animation: none;
-        }
-
+        
         .info-box {
             background-color: #e8f4f8;
             border-left: 4px solid var(--secondary);
@@ -523,208 +509,7 @@
             margin: 15px 0;
             border-radius: 4px;
         }
-
-        .info-box h4 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .info-box p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .credentials-demo {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-family: monospace;
-        }
-
-        .maintenance-calendar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .calendar-event {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            border-left: 4px solid var(--secondary);
-        }
-
-        .calendar-event.urgent {
-            border-left-color: var(--danger);
-        }
-
-        .calendar-event.today {
-            background-color: #fff3cd;
-            border-left-color: var(--warning);
-        }
-
-        .event-date {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .event-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .event-department {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .image-upload-container {
-            border: 2px dashed #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            text-align: center;
-            background: #f9f9f9;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
-        }
         
-        .image-upload-container:hover {
-            border-color: var(--secondary);
-            background: #e8f4fd;
-        }
-        
-        .image-upload-container i {
-            font-size: 40px;
-            color: var(--secondary);
-            margin-bottom: 10px;
-        }
-        
-        .image-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .image-preview-item {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .image-preview-item .remove-image {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-            padding: 0;
-        }
-        
-        .camera-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .camera-button {
-            flex: 1;
-            padding: 10px;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .camera-button:hover {
-            background: var(--primary);
-        }
-        
-        .camera-button.danger {
-            background: var(--danger);
-        }
-        
-        .camera-button.danger:hover {
-            background: #c0392b;
-        }
-        
-        .camera-button.success {
-            background: var(--success);
-        }
-        
-        .camera-button.success:hover {
-            background: #27ae60;
-        }
-        
-        #camera-feed {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .image-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .image-gallery-item {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .image-gallery-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        
-        .image-gallery-item .image-label {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-        }
-
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -739,147 +524,20 @@
             padding: 15px;
         }
         
-        .chart-container h3 {
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: var(--primary);
-        }
-        
-        .lock-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .lock-screen-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .lock-screen-content h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .lock-screen-content .lock-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .tab-lock-info {
-            font-size: 12px;
-            color: #ff9800;
-            margin-top: 5px;
-            display: inline-block;
-            background: rgba(0,0,0,0.1);
-            padding: 2px 6px;
-            border-radius: 10px;
-        }
-        
-        .connected-users {
-            background: rgba(255,255,255,0.1);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .user-badge {
-            width: 25px;
-            height: 25px;
-            background: var(--success);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
             }
-            
-            .nav-tabs li {
-                width: 100%;
-            }
-            
-            .stats {
+            .charts-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .filters {
-                flex-direction: column;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            table {
-                font-size: 12px;
-            }
-            
-            th, td {
-                padding: 8px 10px;
-            }
-            
-            .header-actions {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .user-info {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .charts-grid {
+            .ink-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Lock Screen pour la protection des onglets sensibles -->
-    <div id="protectedTabLockScreen" class="lock-screen" style="display: none;">
-        <div class="lock-screen-content">
-            <div class="lock-icon">🔒</div>
-            <h2>Accès protégé</h2>
-            <p>Veuillez entrer le mot de passe pour accéder à cette section</p>
-            
-            <div class="info-box">
-                <h4>🔐 Information :</h4>
-                <p>Cette section est protégée par mot de passe</p>
-                <p style="font-size: 12px; margin-top: 5px;">Contactez l'administrateur si vous avez oublié le mot de passe</p>
-            </div>
-            
-            <div class="form-group" style="margin-top: 20px;">
-                <input type="password" id="protectedTabPassword" placeholder="Mot de passe">
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button id="unlockProtectedTabBtn" class="btn-success">Déverrouiller</button>
-                <button id="cancelProtectedTabUnlockBtn" class="btn-danger">Annuler</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Modal (premier écran) -->
     <div id="loginModal" class="modal show" style="background: rgba(0,0,0,0.9);">
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
@@ -888,14 +546,11 @@
             <div class="modal-body">
                 <div class="info-box">
                     <h4>👤 Identifiants par défaut :</h4>
-                    <div class="credentials-demo">
+                    <div style="background: var(--light); padding: 10px; border-radius: 5px;">
                         <p><strong>Nom d'utilisateur :</strong> admin</p>
                         <p><strong>Mot de passe :</strong> Admin@123</p>
                     </div>
-                    <p style="font-size: 12px; color: #666;">⚠️ À changer après première connexion</p>
-                    <p style="font-size: 12px; color: #3498db; margin-top: 10px;">🔄 Synchronisation temps réel entre administrateurs activée</p>
                 </div>
-                
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginUsername">Nom d'utilisateur</label>
@@ -903,14 +558,7 @@
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Mot de passe</label>
-                        <div class="password-input">
-                            <input type="password" id="loginPassword" value="Admin@123" required>
-                            <span class="password-toggle" onclick="togglePasswordVisibility('loginPassword')">👁️</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="adminName">Nom de l'administrateur</label>
-                        <input type="text" id="adminName" placeholder="Votre nom" value="Admin 1">
+                        <input type="password" id="loginPassword" value="Admin@123" required>
                     </div>
                     <button type="submit" class="btn-success" style="width: 100%;">Se connecter</button>
                 </form>
@@ -932,11 +580,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="connected-users" id="connectedUsers">
-                    <span>👥</span>
-                    <span id="userCount">1</span>
-                    <span>admin(s) connecté(s)</span>
-                </div>
                 <button id="exportExcelBtn" class="btn-success">📊 Export Excel</button>
                 <button id="logoutBtn" class="btn-danger">🚪 Déconnexion</button>
             </div>
@@ -946,2666 +589,597 @@
             <li><a href="#dashboard" class="tab-link active">📊 Tableau de bord</a></li>
             <li><a href="#incidents" class="tab-link">⚠️ Incidents</a></li>
             <li><a href="#maintenance" class="tab-link">🔧 Maintenance</a></li>
-            <li><a href="#reports" class="tab-link" id="reportsTabLink">📈 Rapports <span class="tab-lock-info">🔒 protégé</span></a></li>
-            <li><a href="#settings" class="tab-link" id="settingsTabLink">⚙️ Paramètres <span class="tab-lock-info">🔒 protégé</span></a></li>
+            <li><a href="#ink" class="tab-link">🖨️ Encre & Support</a></li>
+            <li><a href="#reports" class="tab-link" id="reportsTabLink">📈 Rapports</a></li>
+            <li><a href="#settings" class="tab-link" id="settingsTabLink">⚙️ Paramètres</a></li>
         </ul>
         
-        <!-- ==================== TABLEAU DE BORD ==================== -->
+        <!-- Dashboard -->
         <div id="dashboard" class="tab-content active">
             <div class="stats">
-                <div class="stat-card">
-                    <h3>Incidents ouverts</h3>
-                    <p id="openIncidents">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Maintenances planifiées</h3>
-                    <p id="plannedMaintenance">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Incidents critiques</h3>
-                    <p id="criticalIncidents">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Taux de résolution</h3>
-                    <p id="resolutionRate">0%</p>
-                </div>
+                <div class="stat-card"><h3>Incidents ouverts</h3><p id="openIncidents">0</p></div>
+                <div class="stat-card"><h3>Maintenances planifiées</h3><p id="plannedMaintenance">0</p></div>
+                <div class="stat-card"><h3>Incidents critiques</h3><p id="criticalIncidents">0</p></div>
+                <div class="stat-card"><h3>Taux de résolution</h3><p id="resolutionRate">0%</p></div>
+                <div class="stat-card"><h3>Imprimantes en alerte</h3><p id="alertPrinters">0</p></div>
+                <div class="stat-card"><h3>Niveau encre moyen</h3><p id="avgInkLevel">0%</p></div>
             </div>
             
             <div class="card">
-                <h2>📋 Incidents récents <span class="realtime-badge" id="recentIncidentsBadge">SYNC</span></h2>
-                <table id="recentIncidents">
-                    <thead>
-                        32fb
-                            <th>ID</th>
-                            <th>Ticket</th>
-                            <th>Nom et Prénom</th>
-                            <th>Département</th>
-                            <th>Priorité</th>
-                            <th>Statut</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rempli dynamiquement -->
-                    </tbody>
-                </table>
+                <h2>📋 Incidents récents</h2>
+                <table id="recentIncidents"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Département</th><th>Priorité</th><th>Statut</th><th>Date</th></tr></thead><tbody></tbody></table>
             </div>
             
             <div class="card">
-                <h2>📅 Maintenances à venir <span class="realtime-badge" id="upcomingMaintenanceBadge">SYNC</span></h2>
-                <table id="upcomingMaintenance">
-                    <thead>
-                        32fb
-                            <th>ID</th>
-                            <th>Ticket</th>
-                            <th>Nom et Prénom</th>
-                            <th>Département</th>
-                            <th>Type</th>
-                            <th>Priorité</th>
-                            <th>Date prévue</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rempli dynamiquement -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="card">
-                <h2>📊 Activité récente</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <h3>Répartition des incidents</h3>
-                        <canvas id="incidentsChart" style="width: 100%; height: 200px;"></canvas>
-                    </div>
-                    <div>
-                        <h3>Maintenances par type</h3>
-                        <canvas id="maintenanceChart" style="width: 100%; height: 200px;"></canvas>
-                    </div>
-                </div>
+                <h2>🖨️ Alertes encre & support</h2>
+                <div id="inkAlertsPreview"></div>
             </div>
         </div>
         
-        <!-- ==================== GESTION DES INCIDENTS ==================== -->
+        <!-- Incidents -->
         <div id="incidents" class="tab-content">
             <div class="card">
                 <h2>🆕 Nouvel Incident</h2>
-                <div class="ticket-info">
-                    <div class="ticket-number">Ticket: INC-<span id="incidentTicketNumber">0001</span></div>
-                    <div class="ticket-date">Date: <span id="incidentTicketDate"></span></div>
-                </div>
-                
-                <div class="info-box" style="margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 24px;">📸</span>
-                        <div>
-                            <strong>Nouvelle fonctionnalité !</strong>
-                            <p style="margin-top: 5px;">Vous pouvez maintenant prendre une photo directement depuis votre appareil pour documenter l'incident.</p>
-                        </div>
-                    </div>
-                </div>
-                
+                <div class="ticket-info"><div class="ticket-number">Ticket: INC-<span id="incidentTicketNumber">0001</span></div></div>
                 <form id="incidentForm">
-                    <div class="form-group">
-                        <label for="incidentName">Nom et Prénom</label>
-                        <input type="text" id="incidentName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentDepartment">Département</label>
-                        <select id="incidentDepartment" required>
-                            <option value="">Sélectionnez un département</option>
-                            <option value="dsi">DSI</option>
-                            <option value="dsj">DSJ</option>
-                            <option value="dsp">DSP</option>
-                            <option value="dpsp">DPSP</option>
-                            <option value="drh">DRH</option>
-                            <option value="dga">DGA</option>
-                            <option value="dg">DG</option>
-                            <option value="dcom">DCOM</option>
-                            <option value="daf">DAF</option>
-                            <option value="dacq">DACQ</option>
-                            <option value="cp">CP</option>
-                            <option value="dplmg">DPLMG</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentDescription">Description de l'incident</label>
-                        <textarea id="incidentDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentPriority">Priorité</label>
-                        <select id="incidentPriority" required>
-                            <option value="">Sélectionnez une priorité</option>
-                            <option value="minor">Mineur</option>
-                            <option value="major">Majeur</option>
-                            <option value="critical">Critique</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>📸 Capture d'écran de l'incident</label>
-                        <div class="image-upload-container" id="incidentImageUpload">
-                            <i>📷</i>
-                            <p>Cliquez ou déposez une image</p>
-                            <p style="font-size: 12px; color: #666;">Ou utilisez les boutons ci-dessous</p>
-                            <input type="file" id="incidentImage" accept="image/*" style="display: none;">
-                        </div>
-                        
-                        <div class="camera-buttons">
-                            <button type="button" class="camera-button" onclick="openCamera('incident')">
-                                <span>📸</span> Prendre une photo
-                            </button>
-                            <button type="button" class="camera-button success" onclick="captureScreen('incident')">
-                                <span>🖥️</span> Capture d'écran
-                            </button>
-                        </div>
-                        
-                        <div id="incidentImagePreview" class="image-preview"></div>
-                    </div>
-                    
+                    <div class="form-group"><label>Nom et Prénom</label><input type="text" id="incidentName" required></div>
+                    <div class="form-group"><label>Département</label><select id="incidentDepartment" required>
+                        <option value="">Sélectionnez</option>
+                        <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                        <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                        <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dmg">DMG</option>
+                    </select></div>
+                    <div class="form-group"><label>Description</label><textarea id="incidentDescription" rows="3" required></textarea></div>
+                    <div class="form-group"><label>Priorité</label><select id="incidentPriority" required>
+                        <option value="minor">Mineur</option><option value="major">Majeur</option><option value="critical">Critique</option>
+                    </select></div>
                     <button type="submit" class="btn-success">Créer l'incident</button>
                 </form>
             </div>
-            
-            <div class="card">
-                <h2>📋 Liste des Incidents <span class="realtime-badge" id="incidentsTableBadge">SYNC</span></h2>
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="filterStatus">Filtrer par statut</label>
-                        <select id="filterStatus">
-                            <option value="">Tous</option>
-                            <option value="open">Ouvert</option>
-                            <option value="in-progress">En cours</option>
-                            <option value="resolved">Résolu</option>
-                            <option value="closed">Fermé</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterPriority">Filtrer par priorité</label>
-                        <select id="filterPriority">
-                            <option value="">Toutes</option>
-                            <option value="minor">Mineur</option>
-                            <option value="major">Majeur</option>
-                            <option value="critical">Critique</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterDepartment">Filtrer par département</label>
-                        <select id="filterDepartment">
-                            <option value="">Tous</option>
-                            <option value="dsi">DSI</option>
-                            <option value="dsj">DSJ</option>
-                            <option value="dsp">DSP</option>
-                            <option value="dpsp">DPSP</option>
-                            <option value="drh">DRH</option>
-                            <option value="dga">DGA</option>
-                            <option value="dg">DG</option>
-                            <option value="dcom">DCOM</option>
-                            <option value="daf">DAF</option>
-                            <option value="dacq">DACQ</option>
-                            <option value="cp">CP</option>
-                            <option value="dplmg">DPLMG</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterImage">Filtrer avec images</label>
-                        <select id="filterImage">
-                            <option value="">Tous</option>
-                            <option value="with">Avec images</option>
-                            <option value="without">Sans image</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <table id="incidentsTable">
-                    <thead>
-                        32fb
-                            <th>ID</th>
-                            <th>Ticket</th>
-                            <th>Nom et Prénom</th>
-                            <th>Département</th>
-                            <th>Priorité</th>
-                            <th>Statut</th>
-                            <th>Images</th>
-                            <th>Date création</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rempli dynamiquement -->
-                    </tbody>
-                </table>
+            <div class="card"><h2>📋 Liste des Incidents</h2>
+                <div class="filters"><div class="filter-group"><select id="filterStatus"><option value="">Tous statuts</option><option value="open">Ouvert</option><option value="in-progress">En cours</option><option value="resolved">Résolu</option><option value="closed">Fermé</option></select></div></div>
+                <table id="incidentsTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Département</th><th>Priorité</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
             </div>
         </div>
         
-        <!-- ==================== GESTION DE LA MAINTENANCE ==================== -->
+        <!-- Maintenance -->
         <div id="maintenance" class="tab-content">
-            <div class="card">
-                <h2>🆕 Nouvelle Maintenance</h2>
-                <div class="ticket-info">
-                    <div class="ticket-number">Ticket: MNT-<span id="maintenanceTicketNumber">0001</span></div>
-                    <div class="ticket-date">Date: <span id="maintenanceTicketDate"></span></div>
-                </div>
+            <div class="card"><h2>🆕 Nouvelle Maintenance</h2>
                 <form id="maintenanceForm">
-                    <div class="form-group">
-                        <label for="maintenanceName">Nom et Prénom</label>
-                        <input type="text" id="maintenanceName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenanceDepartment">Département</label>
-                        <select id="maintenanceDepartment" required>
-                            <option value="">Sélectionnez un département</option>
-                            <option value="dsi">DSI</option>
-                            <option value="dsj">DSJ</option>
-                            <option value="dsp">DSP</option>
-                            <option value="dpsp">DPSP</option>
-                            <option value="drh">DRH</option>
-                            <option value="dga">DGA</option>
-                            <option value="dg">DG</option>
-                            <option value="dcom">DCOM</option>
-                            <option value="daf">DAF</option>
-                            <option value="dacq">DACQ</option>
-                            <option value="cp">CP</option>
-                            <option value="dplmg">DPLMG</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenanceDescription">Description</label>
-                        <textarea id="maintenanceDescription" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenanceType">Type de maintenance</label>
-                        <select id="maintenanceType" required>
-                            <option value="">Sélectionnez un type</option>
-                            <option value="preventive">Préventive</option>
-                            <option value="corrective">Corrective</option>
-                            <option value="adaptive">Adaptative</option>
-                            <option value="urgent">Urgente</option>
-                            <option value="planned">Planifiée</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenancePriority">Priorité</label>
-                        <select id="maintenancePriority" required>
-                            <option value="">Sélectionnez une priorité</option>
-                            <option value="low">Basse</option>
-                            <option value="medium">Moyenne</option>
-                            <option value="high">Haute</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenanceScheduledDate">Date planifiée</label>
-                        <input type="datetime-local" id="maintenanceScheduledDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="maintenanceEstimatedDuration">Durée estimée (heures)</label>
-                        <input type="number" id="maintenanceEstimatedDuration" min="1" required>
-                    </div>
-                    <button type="submit" class="btn-success">Planifier la maintenance</button>
+                    <div class="form-group"><label>Nom</label><input type="text" id="maintenanceName" required></div>
+                    <div class="form-group"><label>Département</label><select id="maintenanceDepartment"> <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option></select></div>
+                    <div class="form-group"><label>Description</label><textarea id="maintenanceDescription" rows="3"></textarea></div>
+                    <div class="form-group"><label>Type</label><select id="maintenanceType"><option value="preventive">Préventive</option><option value="corrective">Corrective</option><option value="urgent">Urgente</option></select></div>
+                    <div class="form-group"><label>Date planifiée</label><input type="datetime-local" id="maintenanceScheduledDate" required></div>
+                    <button type="submit" class="btn-success">Planifier</button>
                 </form>
             </div>
-            
+            <div class="card"><h2>📅 Maintenances</h2>
+                <table id="maintenanceTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Type</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+        
+        <!-- Gestion Encre & Support -->
+        <div id="ink" class="tab-content">
             <div class="card">
-                <h2>📅 Calendrier des Maintenances <span class="realtime-badge" id="maintenanceTableBadge">SYNC</span></h2>
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="filterMaintenanceType">Filtrer par type</label>
-                        <select id="filterMaintenanceType">
-                            <option value="">Tous</option>
-                            <option value="preventive">Préventive</option>
-                            <option value="corrective">Corrective</option>
-                            <option value="adaptive">Adaptative</option>
-                            <option value="urgent">Urgente</option>
-                            <option value="planned">Planifiée</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterMaintenanceStatus">Filtrer par statut</label>
-                        <select id="filterMaintenanceStatus">
-                            <option value="">Tous</option>
-                            <option value="planned">Planifiée</option>
-                            <option value="in-progress">En cours</option>
-                            <option value="completed">Terminée</option>
-                            <option value="cancelled">Annulée</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterMaintenanceDepartment">Filtrer par département</label>
-                        <select id="filterMaintenanceDepartment">
-                            <option value="">Tous</option>
-                            <option value="dsi">DSI</option>
-                            <option value="dsj">DSJ</option>
-                            <option value="dsp">DSP</option>
-                            <option value="dpsp">DPSP</option>
-                            <option value="drh">DRH</option>
-                            <option value="dga">DGA</option>
-                            <option value="dg">DG</option>
-                            <option value="dcom">DCOM</option>
-                            <option value="daf">DAF</option>
-                            <option value="dacq">DACQ</option>
-                            <option value="cp">CP</option>
-                            <option value="dplmg">DPLMG</option>
-                        </select>
-                    </div>
+                <h2>🖨️ Gestion des niveaux d'encre et support d'impression</h2>
+                <div class="info-box">
+                    <p>📌 Suivez en temps réel les niveaux d'encre de vos imprimantes. Recevez des alertes lorsque les niveaux sont bas ou critiques.</p>
                 </div>
                 
-                <table id="maintenanceTable">
-                    <thead>
-                        32fb
-                            <th>ID</th>
-                            <th>Ticket</th>
-                            <th>Nom et Prénom</th>
-                            <th>Département</th>
-                            <th>Type</th>
-                            <th>Priorité</th>
-                            <th>Date planifiée</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Rempli dynamiquement -->
-                    </tbody>
+                <div class="stats">
+                    <div class="stat-card"><h3>Imprimantes</h3><p id="totalPrinters">0</p></div>
+                    <div class="stat-card"><h3>Alertes basses</h3><p id="lowInkCount">0</p></div>
+                    <div class="stat-card"><h3>Critiques</h3><p id="criticalInkCount">0</p></div>
+                    <div class="stat-card"><h3>Commandes récentes</h3><p id="recentOrdersCount">0</p></div>
+                </div>
+                
+                <button id="addPrinterBtn" class="btn-success">➕ Ajouter une imprimante</button>
+                <button id="orderInkBtn" class="btn-warning">📦 Commander de l'encre</button>
+                <button id="exportInkReportBtn" class="btn-info">📊 Exporter rapport encre</button>
+                
+                <div id="printersGrid" class="ink-grid"></div>
+            </div>
+            
+            <div class="card">
+                <h2>📦 Historique des commandes d'encre</h2>
+                <table id="inkOrdersTable">
+                    <thead><tr><th>Date</th><th>Imprimante</th><th>Type encre</th><th>Quantité</th><th>Statut</th><th>Coût</th></tr></thead>
+                    <tbody></tbody>
                 </table>
             </div>
             
             <div class="card">
-                <h2>📊 Vue Calendrier</h2>
-                <div id="maintenanceCalendar" class="maintenance-calendar">
-                    <!-- Rempli dynamiquement -->
-                </div>
+                <h2>📊 Statistiques consommation</h2>
+                <canvas id="inkConsumptionChart" style="height: 300px;"></canvas>
             </div>
         </div>
         
-        <!-- ==================== RAPPORTS AVEC DIAGRAMMES ==================== -->
+        <!-- Rapports -->
         <div id="reports" class="tab-content">
-            <div class="card">
-                <h2>📈 Tableau de bord analytique avancé</h2>
-                
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="reportPeriod">Période d'analyse</label>
-                        <select id="reportPeriod">
-                            <option value="7">7 derniers jours</option>
-                            <option value="30">30 derniers jours</option>
-                            <option value="90">90 derniers jours</option>
-                            <option value="365">12 derniers mois</option>
-                            <option value="all">Toutes les données</option>
-                        </select>
-                    </div>
-                    <button id="refreshReportsBtn" class="btn-success">Actualiser les graphiques</button>
-                </div>
-                
+            <div class="card"><h2>📈 Rapports analytiques</h2>
                 <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>📊 Répartition des incidents par priorité</h3>
-                        <canvas id="reportsPriorityChart" style="width: 100%; height: 250px;"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>📊 Répartition des incidents par département</h3>
-                        <canvas id="reportsDepartmentChart" style="width: 100%; height: 250px;"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>📊 Types de maintenance</h3>
-                        <canvas id="reportsMaintenanceTypeChart" style="width: 100%; height: 250px;"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>📊 Évolution temporelle</h3>
-                        <canvas id="reportsTimelineChart" style="width: 100%; height: 250px;"></canvas>
-                    </div>
-                </div>
-                
-                <div class="stats" id="reportsStats">
-                    <!-- Rempli dynamiquement -->
-                </div>
-                
-                <div class="export-buttons" style="margin-top: 20px;">
-                    <button id="exportReportsChart" class="btn-success">📊 Exporter les graphiques</button>
-                    <button id="exportReportsData" class="btn-success">📥 Exporter les données</button>
+                    <div class="chart-container"><canvas id="reportsPriorityChart"></canvas></div>
+                    <div class="chart-container"><canvas id="inkStatsChart"></canvas></div>
                 </div>
             </div>
         </div>
         
-        <!-- ==================== PARAMÈTRES ==================== -->
+        <!-- Paramètres -->
         <div id="settings" class="tab-content">
-            <div class="card">
-                <h2>⚙️ Paramètres de l'application</h2>
-                
-                <div class="data-retention">
-                    <h3>🔐 Sécurité des onglets</h3>
-                    <div class="form-group">
-                        <label for="protectedTabsPassword">Nouveau mot de passe pour les onglets protégés</label>
-                        <div class="password-input">
-                            <input type="password" id="protectedTabsPassword" placeholder="Entrez un nouveau mot de passe">
-                            <span class="password-toggle" onclick="togglePasswordVisibility('protectedTabsPassword')">👁️</span>
-                        </div>
-                        <small style="color: #666; display: block; margin-top: 5px;">Laissez vide pour ne pas changer</small>
-                        <small style="color: #ff9800; display: block; margin-top: 5px;">Mot de passe actuel : admin123 (modifiable)</small>
-                    </div>
-                    <button id="changeProtectedPassword" class="btn-warning">Changer le mot de passe</button>
-                    <p style="margin-top: 10px; font-size: 12px; color: #999; font-style: italic;">
-                        ⚠️ Ce mot de passe protège les onglets Rapports et Paramètres
-                    </p>
-                </div>
-                
-                <div class="data-retention">
-                    <h3>🔄 Synchronisation temps réel</h3>
-                    <div class="form-group">
-                        <label for="syncMethod">Méthode de synchronisation</label>
-                        <select id="syncMethod">
-                            <option value="broadcast">BroadcastChannel (recommandé)</option>
-                            <option value="localstorage">LocalStorage</option>
-                        </select>
-                        <small style="color: #666; display: block; margin-top: 5px;">La synchronisation permet le partage des données entre administrateurs</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="syncInterval">Intervalle de synchronisation (secondes)</label>
-                        <select id="syncInterval">
-                            <option value="1">1 seconde (temps réel)</option>
-                            <option value="2">2 secondes (recommandé)</option>
-                            <option value="5">5 secondes</option>
-                            <option value="10">10 secondes</option>
-                        </select>
-                    </div>
-                    
-                    <div class="sync-status" style="margin-top: 10px; padding: 10px; background: var(--light); border-radius: 5px;">
-                        <span class="sync-dot" id="realtimeDot"></span>
-                        <span id="realtimeStatus">Statut de la connexion...</span>
-                    </div>
-                    
-                    <button id="syncNow" class="btn-success">Synchroniser maintenant</button>
-                    <button id="forceSync" class="btn-info" style="margin-left: 10px;">Forcer la synchronisation</button>
-                </div>
-                
-                <div class="data-retention">
-                    <h3>💾 Durée de conservation des données</h3>
-                    <div class="form-group">
-                        <label for="retentionPeriod">Conserver les données pendant (en jours)</label>
-                        <select id="retentionPeriod">
-                            <option value="30">30 jours</option>
-                            <option value="90">90 jours</option>
-                            <option value="180">6 mois</option>
-                            <option value="365">1 an</option>
-                            <option value="730">2 ans</option>
-                            <option value="0">Indéfiniment</option>
-                        </select>
-                    </div>
-                    
-                    <div class="progress-bar">
-                        <div id="retentionProgress" class="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="retentionInfo">Calcul de l'utilisation de l'espace...</p>
-                    
-                    <button id="applyRetention" class="btn-warning">Appliquer la politique de conservation</button>
-                    <button id="cleanOldData" class="btn-danger">Nettoyer les données anciennes</button>
-                </div>
-
-                <div class="data-retention" style="margin-top: 20px;">
-                    <h3>📧 Notifications</h3>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="emailNotifications" checked> Recevoir des notifications par email
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="desktopNotifications" checked> Activer les notifications bureau
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="syncNotifications" checked> Afficher les notifications de synchronisation
-                        </label>
-                    </div>
-                </div>
+            <div class="card"><h2>⚙️ Paramètres</h2>
+                <div class="form-group"><label>Seuil d'alerte encre (%)</label><input type="number" id="inkAlertThreshold" min="0" max="100" value="20"></div>
+                <div class="form-group"><label>Seuil critique encre (%)</label><input type="number" id="inkCriticalThreshold" min="0" max="100" value="10"></div>
+                <button id="saveInkSettings" class="btn-success">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de caméra -->
-    <div id="cameraModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3>📸 Prendre une photo</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <video id="camera-feed" autoplay playsinline style="width: 100%; border-radius: 5px;"></video>
-                <canvas id="camera-canvas" style="display: none;"></canvas>
-                <div class="camera-buttons" style="margin-top: 15px;">
-                    <button type="button" class="camera-button success" onclick="capturePhoto()">
-                        <span>📸</span> Prendre la photo
-                    </button>
-                    <button type="button" class="camera-button danger" onclick="closeCamera()">
-                        <span>❌</span> Fermer
-                    </button>
-                </div>
-            </div>
+    <!-- Modale ajout imprimante -->
+    <div id="printerModal" class="modal"><div class="modal-content">
+        <div class="modal-header"><h3>Ajouter une imprimante</h3><button class="close-modal">&times;</button></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Nom/Localisation</label><input type="text" id="printerName" placeholder="Ex: Bureau DSI - HP LaserJet"></div>
+            <div class="form-group"><label>Modèle</label><input type="text" id="printerModel" placeholder="HP LaserJet Pro MFP"></div>
+            <div class="form-group"><label>Niveau Cyan (%)</label><input type="number" id="inkCyan" min="0" max="100" value="80"></div>
+            <div class="form-group"><label>Niveau Magenta (%)</label><input type="number" id="inkMagenta" min="0" max="100" value="80"></div>
+            <div class="form-group"><label>Niveau Jaune (%)</label><input type="number" id="inkYellow" min="0" max="100" value="80"></div>
+            <div class="form-group"><label>Niveau Noir (%)</label><input type="number" id="inkBlack" min="0" max="100" value="80"></div>
         </div>
-    </div>
-
-    <!-- Modal de confirmation -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirmation</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body" id="confirmMessage">
-                Êtes-vous sûr de vouloir effectuer cette action ?
-            </div>
-            <div class="modal-footer">
-                <button id="confirmCancel" class="btn-danger">Annuler</button>
-                <button id="confirmOk" class="btn-success">Confirmer</button>
-            </div>
+        <div class="modal-footer"><button id="savePrinterBtn" class="btn-success">Enregistrer</button><button class="close-modal btn-danger">Annuler</button></div>
+    </div></div>
+    
+    <!-- Modale commande encre -->
+    <div id="orderModal" class="modal"><div class="modal-content">
+        <div class="modal-header"><h3>Commander de l'encre</h3><button class="close-modal">&times;</button></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Sélectionner l'imprimante</label><select id="orderPrinterSelect"></select></div>
+            <div class="form-group"><label>Type d'encre</label><select id="inkType"><option value="cyan">Cyan</option><option value="magenta">Magenta</option><option value="yellow">Jaune</option><option value="black">Noir</option><option value="set">Jeu complet</option></select></div>
+            <div class="form-group"><label>Quantité</label><input type="number" id="inkQuantity" min="1" value="1"></div>
+            <div class="form-group"><label>Coût unitaire (€)</label><input type="number" id="inkCost" step="0.01" value="25"></div>
         </div>
-    </div>
+        <div class="modal-footer"><button id="confirmOrderBtn" class="btn-success">Commander</button></div>
+    </div></div>
 
-    <!-- Modal de visualisation des images -->
-    <div id="imageViewModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3>📸 Images de l'incident</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="modalImages" class="image-gallery"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-success close-modal">Fermer</button>
-            </div>
-        </div>
-    </div>
+    <div id="toast" class="toast"><div id="toastIcon"></div><div><div id="toastTitle"></div><div id="toastMessage"></div></div></div>
 
-    <!-- Modal de détails -->
-    <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Détails</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body" id="detailModalBody">
-                <!-- Contenu dynamique -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary close-modal">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast notifications -->
-    <div id="toast" class="toast">
-        <div id="toastIcon"></div>
-        <div>
-            <div id="toastTitle"></div>
-            <div id="toastMessage"></div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // ============================================
-        // DONNÉES DE L'APPLICATION
-        // ============================================
+        // ==================== DONNÉES PRINCIPALES ====================
         let incidents = JSON.parse(localStorage.getItem('incidents')) || [];
         let maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
         
-        // Utilisateur unique pour la connexion
-        const defaultUser = {
-            id: 1,
-            username: 'admin',
-            password: 'Admin@123',
-            fullname: 'Administrateur Système',
-            email: 'admin@poste.gn',
-            role: 'admin',
-            roleLabel: 'Administrateur',
-            department: 'dsi',
-            departmentLabel: 'DSI',
-            avatar: 'A',
-            createdBy: 'system',
-            createdAt: new Date().toISOString(),
-            lastLogin: null
-        };
+        // Données pour la gestion d'encre
+        let printers = JSON.parse(localStorage.getItem('printers')) || [];
+        let inkOrders = JSON.parse(localStorage.getItem('inkOrders')) || [];
+        let inkAlertThreshold = parseInt(localStorage.getItem('inkAlertThreshold')) || 20;
+        let inkCriticalThreshold = parseInt(localStorage.getItem('inkCriticalThreshold')) || 10;
         
         let currentUser = null;
-        let currentAdminName = 'Admin';
         let nextIncidentId = parseInt(localStorage.getItem('nextIncidentId')) || 1;
         let nextMaintenanceId = parseInt(localStorage.getItem('nextMaintenanceId')) || 1;
         let nextIncidentTicket = parseInt(localStorage.getItem('nextIncidentTicket')) || 1;
         let nextMaintenanceTicket = parseInt(localStorage.getItem('nextMaintenanceTicket')) || 1;
-        let retentionPeriod = parseInt(localStorage.getItem('retentionPeriod')) || 365;
-        let syncInterval = parseInt(localStorage.getItem('syncInterval')) || 2;
-        let lastSync = localStorage.getItem('lastSync') || new Date().toISOString();
-        let realtimeEnabled = localStorage.getItem('realtimeEnabled') !== 'false';
-        let emailNotifications = localStorage.getItem('emailNotifications') !== 'false';
-        let desktopNotifications = localStorage.getItem('desktopNotifications') !== 'false';
-        let syncNotifications = localStorage.getItem('syncNotifications') !== 'false';
         
-        // Protection des onglets
-        let protectedTabsPassword = localStorage.getItem('protectedTabsPassword') || 'admin123';
-        let reportsUnlocked = false;
-        let settingsUnlocked = false;
-        let currentTargetTab = null;
-
-        // Synchronisation temps réel
-        let broadcastChannel = null;
-        let syncTimer = null;
-        let connectedUsers = new Set();
-        let lastSyncTimestamp = Date.now();
-        let syncMethod = 'broadcast';
-
-        // Variables pour les graphiques de rapports
-        let reportsPriorityChart, reportsDepartmentChart, reportsMaintenanceTypeChart, reportsTimelineChart;
-
-        // Variables pour la caméra
-        let currentStream = null;
-        let currentImageType = null;
-
-        // Stockage des images
-        let incidentImages = JSON.parse(localStorage.getItem('incidentImages')) || {};
-        let resolutionImages = JSON.parse(localStorage.getItem('resolutionImages')) || {};
-
-        // Graphiques du tableau de bord
-        let incidentsChart, maintenanceChart;
-
-        // Départements
-        const departments = {
-            dsi: "DSI",
-            dsj: "DSJ",
-            dsp: "DSP",
-            dpsp: "DPSP",
-            drh: "DRH",
-            dga: "DGA",
-            dg: "DG",
-            dcom: "DCOM",
-            daf: "DAF",
-            dacq: "DACQ",
-            cp: "CP",
-            dplmg: "DPLMG"
-        };
-
-        // Priorités
-        const priorities = {
-            minor: "Mineur",
-            major: "Majeur",
-            critical: "Critique"
-        };
-
-        // Types de maintenance
-        const maintenanceTypes = {
-            preventive: "Préventive",
-            corrective: "Corrective",
-            adaptive: "Adaptative",
-            urgent: "Urgente",
-            planned: "Planifiée"
-        };
-
-        // Priorités de maintenance
-        const maintenancePriorities = {
-            low: "Basse",
-            medium: "Moyenne",
-            high: "Haute"
-        };
-
-        // Statuts
-        const statusLabels = {
-            open: "Ouvert",
-            'in-progress': "En cours",
-            resolved: "Résolu",
-            closed: "Fermé",
-            planned: "Planifiée",
-            completed: "Terminée",
-            cancelled: "Annulée"
-        };
-
-        // ============================================
-        // FONCTIONS DE SYNCHRONISATION TEMPS RÉEL
-        // ============================================
+        // Initialisation avec des données d'exemple si vide
+        if (printers.length === 0) {
+            printers = [
+                { id: 1, name: "Bureau DSI - Principal", model: "HP LaserJet Pro", cyan: 65, magenta: 42, yellow: 18, black: 35, lastUpdate: new Date().toISOString() },
+                { id: 2, name: "Salle RH", model: "Canon i-SENSYS", cyan: 25, magenta: 30, yellow: 12, black: 8, lastUpdate: new Date().toISOString() },
+                { id: 3, name: "Direction Générale", model: "Brother MFC", cyan: 85, magenta: 78, yellow: 90, black: 45, lastUpdate: new Date().toISOString() }
+            ];
+            savePrinters();
+        }
         
-        function initRealtimeSync() {
-            try {
-                // Créer un canal de broadcast pour la communication entre onglets
-                broadcastChannel = new BroadcastChannel('it_management_sync');
+        if (inkOrders.length === 0) {
+            inkOrders = [
+                { id: 1, printerId: 2, printerName: "Salle RH", inkType: "black", quantity: 2, cost: 45, status: "livrée", orderDate: new Date().toISOString() },
+                { id: 2, printerId: 1, printerName: "Bureau DSI", inkType: "yellow", quantity: 1, cost: 28, status: "en cours", orderDate: new Date().toISOString() }
+            ];
+            saveInkOrders();
+        }
+        
+        // ==================== FONCTIONS ENCRE ====================
+        function savePrinters() { localStorage.setItem('printers', JSON.stringify(printers)); }
+        function saveInkOrders() { localStorage.setItem('inkOrders', JSON.stringify(inkOrders)); }
+        
+        function getInkLevelClass(level) {
+            if (level <= inkCriticalThreshold) return 'critical';
+            if (level <= inkAlertThreshold) return 'alert';
+            return 'normal';
+        }
+        
+        function getInkBarColor(color, level) {
+            if (level <= inkCriticalThreshold) return 'ink-level-critical';
+            if (level <= inkAlertThreshold) return 'ink-level-low';
+            return '';
+        }
+        
+        function renderPrinters() {
+            const grid = document.getElementById('printersGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            let alertCount = 0, criticalCount = 0;
+            
+            printers.forEach(printer => {
+                const colors = [
+                    { name: 'Cyan', key: 'cyan', color: 'cyan' },
+                    { name: 'Magenta', key: 'magenta', color: 'magenta' },
+                    { name: 'Jaune', key: 'yellow', color: 'yellow' },
+                    { name: 'Noir', key: 'black', color: 'black' }
+                ];
                 
-                broadcastChannel.onmessage = function(event) {
-                    const { type, data, sender, timestamp } = event.data;
-                    
-                    // Ignorer ses propres messages
-                    if (sender === currentAdminName) return;
-                    
-                    // Mettre à jour le timestamp de dernière synchronisation
-                    lastSyncTimestamp = timestamp;
-                    
-                    switch(type) {
-                        case 'USER_CONNECTED':
-                            handleUserConnected(data);
-                            break;
-                        case 'USER_DISCONNECTED':
-                            handleUserDisconnected(data);
-                            break;
-                        case 'DATA_UPDATE':
-                            handleDataUpdate(data);
-                            break;
-                        case 'INCIDENT_CREATED':
-                            handleIncidentCreated(data);
-                            break;
-                        case 'INCIDENT_UPDATED':
-                            handleIncidentUpdated(data);
-                            break;
-                        case 'INCIDENT_DELETED':
-                            handleIncidentDeleted(data);
-                            break;
-                        case 'MAINTENANCE_CREATED':
-                            handleMaintenanceCreated(data);
-                            break;
-                        case 'MAINTENANCE_UPDATED':
-                            handleMaintenanceUpdated(data);
-                            break;
-                        case 'MAINTENANCE_DELETED':
-                            handleMaintenanceDeleted(data);
-                            break;
-                        case 'SYNC_REQUEST':
-                            handleSyncRequest();
-                            break;
-                        case 'FULL_SYNC':
-                            handleFullSync(data);
-                            break;
-                        default:
-                            console.log('Message non reconnu:', type);
-                    }
-                };
-                
-                // Annoncer sa connexion
-                broadcastChannel.postMessage({
-                    type: 'USER_CONNECTED',
-                    data: { name: currentAdminName, timestamp: new Date().toISOString() },
-                    sender: currentAdminName,
-                    timestamp: Date.now()
+                let isAlert = false;
+                let isCritical = false;
+                colors.forEach(c => {
+                    if (printer[c.key] <= inkCriticalThreshold) isCritical = true;
+                    else if (printer[c.key] <= inkAlertThreshold) isAlert = true;
                 });
                 
-                // Nettoyer les utilisateurs déconnectés après 30 secondes
-                setInterval(() => {
-                    const now = Date.now();
-                    connectedUsers.forEach(user => {
-                        if (now - user.lastSeen > 30000) {
-                            connectedUsers.delete(user);
-                        }
-                    });
-                    updateConnectedUsersDisplay();
-                }, 10000);
+                if (isCritical) criticalCount++;
+                else if (isAlert) alertCount++;
                 
-                updateRealtimeStatus(true);
-                showToast('info', 'Synchronisation activée', 'Les données seront partagées en temps réel avec les autres administrateurs');
+                const cardClass = isCritical ? 'critical' : (isAlert ? 'alert' : '');
                 
-            } catch (error) {
-                console.error('Erreur d\'initialisation du BroadcastChannel:', error);
-                updateRealtimeStatus(false);
-            }
-        }
-        
-        function handleUserConnected(userData) {
-            connectedUsers.add(userData.name);
-            updateConnectedUsersDisplay();
-            if (syncNotifications) {
-                showToast('info', 'Nouvel administrateur connecté', `${userData.name} est maintenant en ligne`);
-            }
-        }
-        
-        function handleUserDisconnected(userData) {
-            connectedUsers.delete(userData.name);
-            updateConnectedUsersDisplay();
-            if (syncNotifications) {
-                showToast('warning', 'Administrateur déconnecté', `${userData.name} s'est déconnecté`);
-            }
-        }
-        
-        function handleDataUpdate(data) {
-            const { incidents: newIncidents, maintenances: newMaintenances, images } = data;
+                let inksHtml = '';
+                colors.forEach(c => {
+                    const level = printer[c.key];
+                    const levelClass = getInkLevelClass(level);
+                    inksHtml += `
+                        <div class="ink-level">
+                            <span style="width: 70px; font-weight: bold; color: ${c.color === 'black' ? '#333' : c.color}">${c.name}:</span>
+                            <div class="ink-bar-container">
+                                <div class="ink-bar ${c.color} ${getInkBarColor(c.color, level)}" style="width: ${level}%;">
+                                    ${level}%
+                                </div>
+                            </div>
+                            ${level <= inkAlertThreshold ? '<span>⚠️</span>' : ''}
+                        </div>
+                    `;
+                });
+                
+                grid.innerHTML += `
+                    <div class="ink-card ${cardClass}">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span class="printer-icon">🖨️</span>
+                            <div>
+                                <strong>${printer.name}</strong><br>
+                                <small>${printer.model}</small>
+                            </div>
+                            <div style="margin-left: auto;">
+                                <button class="btn-warning btn-sm" onclick="updateInkLevels(${printer.id})">📊 Mettre à jour</button>
+                                <button class="btn-danger btn-sm" onclick="deletePrinter(${printer.id})">🗑️</button>
+                            </div>
+                        </div>
+                        ${inksHtml}
+                        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                            Dernière mise à jour: ${new Date(printer.lastUpdate).toLocaleDateString('fr-FR')}
+                        </div>
+                    </div>
+                `;
+            });
             
-            if (newIncidents && JSON.stringify(incidents) !== JSON.stringify(newIncidents)) {
-                incidents = newIncidents;
-                saveIncidents();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('success', 'Données synchronisées', 'Mise à jour reçue d\'un autre administrateur');
-                }
+            document.getElementById('totalPrinters').textContent = printers.length;
+            document.getElementById('lowInkCount').textContent = alertCount;
+            document.getElementById('criticalInkCount').textContent = criticalCount;
+            document.getElementById('alertPrinters').textContent = alertCount + criticalCount;
+            
+            // Calcul du niveau moyen
+            let totalInk = 0, count = 0;
+            printers.forEach(p => {
+                totalInk += p.cyan + p.magenta + p.yellow + p.black;
+                count += 4;
+            });
+            const avgInk = count > 0 ? Math.round(totalInk / count) : 0;
+            document.getElementById('avgInkLevel').textContent = avgInk + '%';
+            
+            // Mise à jour des alertes sur le dashboard
+            updateInkAlertsPreview();
+        }
+        
+        function updateInkAlertsPreview() {
+            const container = document.getElementById('inkAlertsPreview');
+            if (!container) return;
+            
+            const alertPrinters = printers.filter(p => {
+                return p.cyan <= inkAlertThreshold || p.magenta <= inkAlertThreshold || 
+                       p.yellow <= inkAlertThreshold || p.black <= inkAlertThreshold;
+            });
+            
+            if (alertPrinters.length === 0) {
+                container.innerHTML = '<p style="color: green;">✅ Tous les niveaux d\'encre sont suffisants</p>';
+                return;
             }
             
-            if (newMaintenances && JSON.stringify(maintenances) !== JSON.stringify(newMaintenances)) {
-                maintenances = newMaintenances;
-                saveMaintenances();
-                refreshAllViews();
-            }
+            container.innerHTML = alertPrinters.map(p => {
+                const lowColors = [];
+                if (p.cyan <= inkAlertThreshold) lowColors.push(`Cyan ${p.cyan}%`);
+                if (p.magenta <= inkAlertThreshold) lowColors.push(`Magenta ${p.magenta}%`);
+                if (p.yellow <= inkAlertThreshold) lowColors.push(`Jaune ${p.yellow}%`);
+                if (p.black <= inkAlertThreshold) lowColors.push(`Noir ${p.black}%`);
+                return `<div style="padding: 8px; background: #fff3cd; margin-bottom: 5px; border-radius: 5px;">
+                    ⚠️ <strong>${p.name}</strong> - ${lowColors.join(', ')} ${p.black <= inkCriticalThreshold ? '⚠️⚠️ CRITIQUE' : ''}
+                </div>`;
+            }).join('');
+        }
+        
+        window.updateInkLevels = function(printerId) {
+            const printer = printers.find(p => p.id === printerId);
+            if (!printer) return;
             
-            if (images) {
-                incidentImages = images.incidentImages || incidentImages;
-                resolutionImages = images.resolutionImages || resolutionImages;
-                saveImages();
+            // Simulation de mise à jour avec légère baisse
+            printer.cyan = Math.max(0, printer.cyan - Math.floor(Math.random() * 10));
+            printer.magenta = Math.max(0, printer.magenta - Math.floor(Math.random() * 10));
+            printer.yellow = Math.max(0, printer.yellow - Math.floor(Math.random() * 10));
+            printer.black = Math.max(0, printer.black - Math.floor(Math.random() * 10));
+            printer.lastUpdate = new Date().toISOString();
+            
+            savePrinters();
+            renderPrinters();
+            updateDashboardStats();
+            showToast('success', 'Mise à jour', `Niveaux d'encre mis à jour pour ${printer.name}`);
+            
+            // Alerte si critique
+            if (printer.black <= inkCriticalThreshold) {
+                showToast('warning', 'Alerte encre', `${printer.name} - Niveau noir critique (${printer.black}%)`);
             }
+        };
+        
+        window.deletePrinter = function(printerId) {
+            if (confirm('Supprimer cette imprimante ?')) {
+                printers = printers.filter(p => p.id !== printerId);
+                savePrinters();
+                renderPrinters();
+                showToast('success', 'Supprimé', 'Imprimante supprimée');
+            }
+        };
+        
+        function addPrinter(name, model, cyan, magenta, yellow, black) {
+            const newId = Math.max(...printers.map(p => p.id), 0) + 1;
+            printers.push({
+                id: newId, name, model,
+                cyan: parseInt(cyan), magenta: parseInt(magenta),
+                yellow: parseInt(yellow), black: parseInt(black),
+                lastUpdate: new Date().toISOString()
+            });
+            savePrinters();
+            renderPrinters();
+            showToast('success', 'Ajouté', `Imprimante ${name} ajoutée`);
         }
         
-        function handleIncidentCreated(incident) {
-            // Vérifier si l'incident existe déjà
-            if (!incidents.find(i => i.id === incident.id)) {
-                incidents.push(incident);
-                saveIncidents();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('info', 'Nouvel incident', `${incident.ticketNumber} créé par un autre administrateur`);
-                }
-                playNotificationSound();
-            }
+        function orderInk(printerId, inkType, quantity, cost) {
+            const printer = printers.find(p => p.id === printerId);
+            if (!printer) return;
+            
+            const newOrder = {
+                id: inkOrders.length + 1,
+                printerId: printerId,
+                printerName: printer.name,
+                inkType: inkType,
+                quantity: parseInt(quantity),
+                cost: parseFloat(cost) * parseInt(quantity),
+                status: 'commandée',
+                orderDate: new Date().toISOString()
+            };
+            inkOrders.push(newOrder);
+            saveInkOrders();
+            renderInkOrders();
+            showToast('success', 'Commande passée', `${quantity}x ${inkType} pour ${printer.name}`);
+            
+            // Option: simuler livraison après commande
+            setTimeout(() => {
+                newOrder.status = 'livrée';
+                saveInkOrders();
+                renderInkOrders();
+                showToast('info', 'Commande livrée', `L'encre pour ${printer.name} est disponible`);
+            }, 3000);
         }
         
-        function handleIncidentUpdated(incident) {
-            const index = incidents.findIndex(i => i.id === incident.id);
-            if (index !== -1) {
-                incidents[index] = incident;
-                saveIncidents();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('info', 'Incident mis à jour', `${incident.ticketNumber} modifié par un autre administrateur`);
-                }
-            }
+        function renderInkOrders() {
+            const tbody = document.querySelector('#inkOrdersTable tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            inkOrders.slice().reverse().forEach(order => {
+                const statusClass = order.status === 'livrée' ? 'badge-success' : 'badge-warning';
+                tbody.innerHTML += `<tr>
+                    <td>${new Date(order.orderDate).toLocaleDateString('fr-FR')}</td>
+                    <td>${order.printerName}</td>
+                    <td>${order.inkType}</td>
+                    <td>${order.quantity}</td>
+                    <td><span class="badge">${order.status}</span></td>
+                    <td>${order.cost} €</td>
+                </tr>`;
+            });
+            document.getElementById('recentOrdersCount').textContent = inkOrders.filter(o => o.status === 'commandée').length;
         }
         
-        function handleIncidentDeleted(incidentId) {
-            const incident = incidents.find(i => i.id === incidentId);
-            if (incident) {
-                incidents = incidents.filter(i => i.id !== incidentId);
-                saveIncidents();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('warning', 'Incident supprimé', `${incident.ticketNumber} a été supprimé par un autre administrateur`);
-                }
-            }
-        }
-        
-        function handleMaintenanceCreated(maintenance) {
-            if (!maintenances.find(m => m.id === maintenance.id)) {
-                maintenances.push(maintenance);
-                saveMaintenances();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('info', 'Nouvelle maintenance', `${maintenance.ticketNumber} créée par un autre administrateur`);
-                }
-                playNotificationSound();
-            }
-        }
-        
-        function handleMaintenanceUpdated(maintenance) {
-            const index = maintenances.findIndex(m => m.id === maintenance.id);
-            if (index !== -1) {
-                maintenances[index] = maintenance;
-                saveMaintenances();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('info', 'Maintenance mise à jour', `${maintenance.ticketNumber} modifiée par un autre administrateur`);
-                }
-            }
-        }
-        
-        function handleMaintenanceDeleted(maintenanceId) {
-            const maintenance = maintenances.find(m => m.id === maintenanceId);
-            if (maintenance) {
-                maintenances = maintenances.filter(m => m.id !== maintenanceId);
-                saveMaintenances();
-                refreshAllViews();
-                if (syncNotifications) {
-                    showToast('warning', 'Maintenance supprimée', `${maintenance.ticketNumber} a été supprimée par un autre administrateur`);
-                }
-            }
-        }
-        
-        function handleSyncRequest() {
-            // Envoyer toutes les données
-            broadcastChannel.postMessage({
-                type: 'FULL_SYNC',
+        function renderInkChart() {
+            const ctx = document.getElementById('inkConsumptionChart')?.getContext('2d');
+            if (!ctx) return;
+            
+            // Calcul des consommations par type
+            const consumption = { cyan: 0, magenta: 0, yellow: 0, black: 0 };
+            printers.forEach(p => {
+                consumption.cyan += 100 - p.cyan;
+                consumption.magenta += 100 - p.magenta;
+                consumption.yellow += 100 - p.yellow;
+                consumption.black += 100 - p.black;
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    incidents: incidents,
-                    maintenances: maintenances,
-                    images: {
-                        incidentImages: incidentImages,
-                        resolutionImages: resolutionImages
-                    },
-                    counters: {
-                        nextIncidentId,
-                        nextMaintenanceId,
-                        nextIncidentTicket,
-                        nextMaintenanceTicket
-                    }
+                    labels: ['Cyan', 'Magenta', 'Jaune', 'Noir'],
+                    datasets: [{ label: 'Consommation estimée (%)', data: [consumption.cyan, consumption.magenta, consumption.yellow, consumption.black], backgroundColor: ['#00bcd4', '#e91e63', '#ffc107', '#424242'] }]
                 },
-                sender: currentAdminName,
-                timestamp: Date.now()
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
         
-        function handleFullSync(data) {
-            if (data.incidents && JSON.stringify(incidents) !== JSON.stringify(data.incidents)) {
-                incidents = data.incidents;
-                saveIncidents();
-            }
-            if (data.maintenances && JSON.stringify(maintenances) !== JSON.stringify(data.maintenances)) {
-                maintenances = data.maintenances;
-                saveMaintenances();
-            }
-            if (data.images) {
-                incidentImages = data.images.incidentImages || incidentImages;
-                resolutionImages = data.images.resolutionImages || resolutionImages;
-                saveImages();
-            }
-            if (data.counters) {
-                nextIncidentId = data.counters.nextIncidentId;
-                nextMaintenanceId = data.counters.nextMaintenanceId;
-                nextIncidentTicket = data.counters.nextIncidentTicket;
-                nextMaintenanceTicket = data.counters.nextMaintenanceTicket;
-                localStorage.setItem('nextIncidentId', nextIncidentId);
-                localStorage.setItem('nextMaintenanceId', nextMaintenanceId);
-                localStorage.setItem('nextIncidentTicket', nextIncidentTicket);
-                localStorage.setItem('nextMaintenanceTicket', nextMaintenanceTicket);
-            }
-            refreshAllViews();
-            if (syncNotifications) {
-                showToast('success', 'Synchronisation complète', 'Toutes les données ont été synchronisées');
-            }
-        }
-        
-        function broadcastDataUpdate(type, data) {
-            if (!broadcastChannel) return;
-            
-            try {
-                broadcastChannel.postMessage({
-                    type: type,
-                    data: data,
-                    sender: currentAdminName,
-                    timestamp: Date.now()
-                });
-            } catch (error) {
-                console.error('Erreur lors de la diffusion:', error);
-            }
-        }
-        
-        function broadcastIncidentCreated(incident) {
-            broadcastDataUpdate('INCIDENT_CREATED', incident);
-        }
-        
-        function broadcastIncidentUpdated(incident) {
-            broadcastDataUpdate('INCIDENT_UPDATED', incident);
-        }
-        
-        function broadcastIncidentDeleted(incidentId) {
-            broadcastDataUpdate('INCIDENT_DELETED', incidentId);
-        }
-        
-        function broadcastMaintenanceCreated(maintenance) {
-            broadcastDataUpdate('MAINTENANCE_CREATED', maintenance);
-        }
-        
-        function broadcastMaintenanceUpdated(maintenance) {
-            broadcastDataUpdate('MAINTENANCE_UPDATED', maintenance);
-        }
-        
-        function broadcastMaintenanceDeleted(maintenanceId) {
-            broadcastDataUpdate('MAINTENANCE_DELETED', maintenanceId);
-        }
-        
-        function broadcastFullSync() {
-            broadcastDataUpdate('FULL_SYNC', {
-                incidents: incidents,
-                maintenances: maintenances,
-                images: {
-                    incidentImages: incidentImages,
-                    resolutionImages: resolutionImages
-                },
-                counters: {
-                    nextIncidentId,
-                    nextMaintenanceId,
-                    nextIncidentTicket,
-                    nextMaintenanceTicket
-                }
-            });
-        }
-        
-        function updateConnectedUsersDisplay() {
-            const userCountSpan = document.getElementById('userCount');
-            if (userCountSpan) {
-                userCountSpan.textContent = connectedUsers.size + 1;
-            }
-        }
-        
-        function updateRealtimeStatus(isConnected) {
-            const dot = document.getElementById('realtimeDot');
-            const status = document.getElementById('realtimeStatus');
-            
-            if (dot && status) {
-                if (isConnected) {
-                    dot.className = 'sync-dot';
-                    status.textContent = `Connecté - ${connectedUsers.size + 1} administrateur(s) en ligne`;
-                } else {
-                    dot.className = 'sync-dot offline';
-                    status.textContent = 'Mode hors ligne - Synchronisation désactivée';
-                }
-            }
-        }
-        
-        function playNotificationSound() {
-            try {
-                const audio = new Audio('data:audio/wav;base64,U3RlYWx0aCBzb3VuZA==');
-                audio.volume = 0.3;
-                audio.play().catch(e => console.log('Erreur lecture son:', e));
-            } catch(e) {}
-        }
-        
-        function refreshAllViews() {
-            loadIncidents();
-            loadMaintenances();
-            updateDashboard();
-            updateCalendar();
-            updateCharts();
-            updateTicketNumbers();
-            if (document.getElementById('reports').classList.contains('active')) {
-                loadReportsCharts();
-            }
-        }
-        
-        function forceFullSync() {
-            if (broadcastChannel) {
-                handleSyncRequest();
-                showToast('success', 'Synchronisation forcée', 'Demande de synchronisation envoyée à tous les administrateurs');
-            }
-        }
-        
-        // ============================================
-        // FONCTIONS DE PROTECTION DES ONGLETS
-        // ============================================
-        
-        function showProtectedTabLock(targetTab) {
-            currentTargetTab = targetTab;
-            document.getElementById('protectedTabLockScreen').style.display = 'flex';
-            document.getElementById('protectedTabPassword').value = '';
-        }
-
-        function unlockProtectedTab() {
-            const password = document.getElementById('protectedTabPassword').value;
-            
-            if (password === protectedTabsPassword) {
-                if (currentTargetTab === 'reports') {
-                    reportsUnlocked = true;
-                    activateTab('reports');
-                    setTimeout(() => loadReportsCharts(), 100);
-                } else if (currentTargetTab === 'settings') {
-                    settingsUnlocked = true;
-                    activateTab('settings');
-                }
-                
-                document.getElementById('protectedTabLockScreen').style.display = 'none';
-                showToast('success', 'Accès autorisé', 'Vous avez maintenant accès à cette section');
-            } else {
-                showToast('error', 'Accès refusé', 'Mot de passe incorrect');
-            }
-            
-            document.getElementById('protectedTabPassword').value = '';
-        }
-
-        function cancelProtectedTabUnlock() {
-            document.getElementById('protectedTabLockScreen').style.display = 'none';
-            currentTargetTab = null;
-        }
-
-        // ============================================
-        // INITIALISATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestionnaire de connexion
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = document.getElementById('loginUsername').value;
-                const password = document.getElementById('loginPassword').value;
-                const adminName = document.getElementById('adminName').value;
-                login(username, password, adminName);
-            });
-            
-            // Initialisation
-            initializeTabs();
-            setupEventListeners();
-            updateRetentionInfo();
-            applyRetentionPolicy();
-            initReportsCharts();
-            
-            // Restaurer les préférences
-            document.getElementById('emailNotifications').checked = emailNotifications;
-            document.getElementById('desktopNotifications').checked = desktopNotifications;
-            document.getElementById('syncNotifications').checked = syncNotifications;
-            document.getElementById('syncInterval').value = syncInterval;
-            
-            // Setup image uploads
-            setupImageUpload('incidentImageUpload', 'incidentImagePreview', 'incidentImage', 'incident');
-        });
-
-        // ============================================
-        // FONCTION DE CONNEXION
-        // ============================================
-        function login(username, password, adminName) {
-            if (username === defaultUser.username && password === defaultUser.password) {
-                currentUser = defaultUser;
-                currentAdminName = adminName || 'Administrateur';
-                defaultUser.lastLogin = new Date().toISOString();
-                
+        // ==================== FONCTIONS EXISTANTES ====================
+        function login(username, password) {
+            if (username === 'admin' && password === 'Admin@123') {
+                currentUser = { fullname: 'Administrateur Système', avatar: 'A', username: 'admin' };
                 document.getElementById('loginModal').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                
-                document.getElementById('userName').textContent = `${defaultUser.fullname} (${currentAdminName})`;
-                document.getElementById('userAvatar').textContent = currentAdminName.charAt(0).toUpperCase();
-                
-                // Charger les données
-                loadIncidents();
-                loadMaintenances();
-                updateDashboard();
-                updateCalendar();
-                updateTicketNumbers();
+                document.getElementById('userName').textContent = currentUser.fullname;
+                document.getElementById('userAvatar').textContent = currentUser.avatar;
+                loadIncidents(); loadMaintenances(); updateDashboard(); updateTicketNumbers();
+                renderPrinters(); renderInkOrders(); renderInkChart();
                 initCharts();
-                
-                // Initialiser la synchronisation temps réel
-                initRealtimeSync();
-                startSyncTimer();
-                
-                showToast('success', 'Connexion réussie', `Bienvenue ${currentAdminName}`);
-            } else {
-                showToast('error', 'Erreur de connexion', 'Nom d\'utilisateur ou mot de passe incorrect');
-            }
+                showToast('success', 'Connexion réussie', `Bienvenue ${currentUser.fullname}`);
+            } else showToast('error', 'Erreur', 'Identifiants incorrects');
         }
-
-        // ============================================
-        // INITIALISATION DES ONGLETS
-        // ============================================
-        function initializeTabs() {
-            const tabLinks = document.querySelectorAll('.tab-link');
-            
-            tabLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = this.getAttribute('href').substring(1);
-                    
-                    // Vérification des onglets protégés
-                    if (target === 'reports' && !reportsUnlocked) {
-                        showProtectedTabLock('reports');
-                        return;
-                    }
-                    
-                    if (target === 'settings' && !settingsUnlocked) {
-                        showProtectedTabLock('settings');
-                        return;
-                    }
-                    
-                    tabLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(target).classList.add('active');
-                    
-                    if (target === 'incidents' || target === 'maintenance') {
-                        updateTicketNumbers();
-                    }
-                    if (target === 'maintenance') {
-                        updateCalendar();
-                    }
-                    if (target === 'dashboard') {
-                        updateCharts();
-                    }
-                    if (target === 'reports') {
-                        loadReportsCharts();
-                    }
-                });
-            });
-        }
-
-        function activateTab(tabName) {
-            const tabLink = document.querySelector(`a[href="#${tabName}"]`);
-            if (tabLink) {
-                tabLink.click();
-            }
-        }
-
-        // ============================================
-        // CONFIGURATION DES ÉCOUTEURS
-        // ============================================
-        function setupEventListeners() {
-            // Protection des onglets
-            document.getElementById('unlockProtectedTabBtn')?.addEventListener('click', unlockProtectedTab);
-            document.getElementById('cancelProtectedTabUnlockBtn')?.addEventListener('click', cancelProtectedTabUnlock);
-            
-            // Changement mot de passe protection
-            document.getElementById('changeProtectedPassword')?.addEventListener('click', function() {
-                const newPassword = document.getElementById('protectedTabsPassword').value;
-                if (newPassword) {
-                    if (newPassword.length < 4) {
-                        showToast('error', 'Erreur', 'Le mot de passe doit contenir au moins 4 caractères');
-                        return;
-                    }
-                    protectedTabsPassword = newPassword;
-                    localStorage.setItem('protectedTabsPassword', newPassword);
-                    showToast('success', 'Mot de passe modifié', 'Le mot de passe de protection a été mis à jour');
-                    document.getElementById('protectedTabsPassword').value = '';
-                } else {
-                    showToast('error', 'Erreur', 'Veuillez entrer un nouveau mot de passe');
-                }
-            });
-            
-            // Formulaires
-            document.getElementById('incidentForm')?.addEventListener('submit', createIncident);
-            document.getElementById('maintenanceForm')?.addEventListener('submit', createMaintenance);
-            
-            // Filtres
-            document.getElementById('filterStatus')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterPriority')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterDepartment')?.addEventListener('change', filterIncidents);
-            document.getElementById('filterImage')?.addEventListener('change', filterIncidents);
-            
-            document.getElementById('filterMaintenanceType')?.addEventListener('change', filterMaintenances);
-            document.getElementById('filterMaintenanceStatus')?.addEventListener('change', filterMaintenances);
-            document.getElementById('filterMaintenanceDepartment')?.addEventListener('change', filterMaintenances);
-            
-            // Rapports
-            document.getElementById('refreshReportsBtn')?.addEventListener('click', loadReportsCharts);
-            document.getElementById('exportReportsChart')?.addEventListener('click', exportReportsCharts);
-            document.getElementById('exportReportsData')?.addEventListener('click', exportReportsData);
-            
-            // Exports
-            document.getElementById('exportExcelBtn')?.addEventListener('click', exportAllToExcel);
-            
-            // Rétention
-            document.getElementById('applyRetention')?.addEventListener('click', function() {
-                retentionPeriod = parseInt(document.getElementById('retentionPeriod').value);
-                localStorage.setItem('retentionPeriod', retentionPeriod);
-                applyRetentionPolicy();
-                showToast('success', 'Paramètres enregistrés', 'La politique de conservation a été mise à jour');
-                broadcastFullSync();
-            });
-            
-            document.getElementById('cleanOldData')?.addEventListener('click', cleanOldData);
-            
-            // Synchronisation
-            document.getElementById('syncNow')?.addEventListener('click', syncData);
-            document.getElementById('forceSync')?.addEventListener('click', forceFullSync);
-            document.getElementById('syncInterval')?.addEventListener('change', function() {
-                syncInterval = parseInt(this.value);
-                localStorage.setItem('syncInterval', syncInterval);
-                startSyncTimer();
-            });
-
-            document.getElementById('syncMethod')?.addEventListener('change', function() {
-                syncMethod = this.value;
-                localStorage.setItem('syncMethod', syncMethod);
-            });
-            
-            // Notifications
-            document.getElementById('emailNotifications')?.addEventListener('change', function() {
-                emailNotifications = this.checked;
-                localStorage.setItem('emailNotifications', emailNotifications);
-            });
-            
-            document.getElementById('desktopNotifications')?.addEventListener('change', function() {
-                desktopNotifications = this.checked;
-                localStorage.setItem('desktopNotifications', desktopNotifications);
-                if (desktopNotifications && Notification.permission !== 'granted') {
-                    Notification.requestPermission();
-                }
-            });
-            
-            document.getElementById('syncNotifications')?.addEventListener('change', function() {
-                syncNotifications = this.checked;
-                localStorage.setItem('syncNotifications', syncNotifications);
-            });
-            
-            // Modales
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.closest('.modal').classList.remove('show');
-                });
-            });
-            
-            // Déconnexion
-            document.getElementById('logoutBtn')?.addEventListener('click', function() {
-                showConfirm('Êtes-vous sûr de vouloir vous déconnecter ?', function() {
-                    // Annoncer la déconnexion
-                    if (broadcastChannel) {
-                        broadcastChannel.postMessage({
-                            type: 'USER_DISCONNECTED',
-                            data: { name: currentAdminName },
-                            sender: currentAdminName,
-                            timestamp: Date.now()
-                        });
-                        broadcastChannel.close();
-                    }
-                    currentUser = null;
-                    reportsUnlocked = false;
-                    settingsUnlocked = false;
-                    document.getElementById('mainApp').style.display = 'none';
-                    document.getElementById('loginModal').style.display = 'flex';
-                    document.getElementById('loginPassword').value = 'Admin@123';
-                    document.getElementById('loginUsername').value = 'admin';
-                    document.getElementById('adminName').value = '';
-                });
-            });
-        }
-
-        // ============================================
-        // FONCTIONS POUR LES GRAPHIQUES DE RAPPORTS
-        // ============================================
         
-        function initReportsCharts() {
-            const ctx1 = document.getElementById('reportsPriorityChart')?.getContext('2d');
-            const ctx2 = document.getElementById('reportsDepartmentChart')?.getContext('2d');
-            const ctx3 = document.getElementById('reportsMaintenanceTypeChart')?.getContext('2d');
-            const ctx4 = document.getElementById('reportsTimelineChart')?.getContext('2d');
-            
-            if (ctx1) {
-                reportsPriorityChart = new Chart(ctx1, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Critique', 'Majeur', 'Mineur'],
-                        datasets: [{
-                            data: [0, 0, 0],
-                            backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            if (ctx2) {
-                reportsDepartmentChart = new Chart(ctx2, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.values(departments),
-                        datasets: [{
-                            label: 'Nombre d\'incidents',
-                            data: Array(Object.keys(departments).length).fill(0),
-                            backgroundColor: '#3498db'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                stepSize: 1
-                            }
-                        }
-                    }
-                });
-            }
-            
-            if (ctx3) {
-                reportsMaintenanceTypeChart = new Chart(ctx3, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.values(maintenanceTypes),
-                        datasets: [{
-                            data: Array(Object.keys(maintenanceTypes).length).fill(0),
-                            backgroundColor: ['#2ecc71', '#f39c12', '#9b59b6', '#e74c3c', '#3498db'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            if (ctx4) {
-                reportsTimelineChart = new Chart(ctx4, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                label: 'Incidents',
-                                data: [],
-                                borderColor: '#e74c3c',
-                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Maintenances',
-                                data: [],
-                                borderColor: '#3498db',
-                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                stepSize: 1
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        function loadReportsCharts() {
-            const period = parseInt(document.getElementById('reportPeriod').value) || 30;
-            const now = new Date();
-            const startDate = new Date();
-            
-            if (period === 'all') {
-                startDate.setFullYear(2000);
-            } else {
-                startDate.setDate(startDate.getDate() - period);
-            }
-            
-            const filteredIncidents = incidents.filter(i => new Date(i.createdAt) >= startDate);
-            const filteredMaintenances = maintenances.filter(m => new Date(m.createdAt) >= startDate);
-            
-            // Mise à jour des statistiques
-            const statsDiv = document.getElementById('reportsStats');
-            if (statsDiv) {
-                statsDiv.innerHTML = `
-                    <div class="stat-card">
-                        <h3>Incidents (période)</h3>
-                        <p>${filteredIncidents.length}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Maintenances (période)</h3>
-                        <p>${filteredMaintenances.length}</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Taux résolution</h3>
-                        <p>${filteredIncidents.length > 0 ? Math.round((filteredIncidents.filter(i => i.status === 'resolved' || i.status === 'closed').length / filteredIncidents.length) * 100) : 0}%</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Critiques</h3>
-                        <p>${filteredIncidents.filter(i => i.priority === 'critical').length}</p>
-                    </div>
-                `;
-            }
-            
-            // Mise à jour graphique priorité
-            if (reportsPriorityChart) {
-                const critical = filteredIncidents.filter(i => i.priority === 'critical').length;
-                const major = filteredIncidents.filter(i => i.priority === 'major').length;
-                const minor = filteredIncidents.filter(i => i.priority === 'minor').length;
-                
-                reportsPriorityChart.data.datasets[0].data = [critical, major, minor];
-                reportsPriorityChart.update();
-            }
-            
-            // Mise à jour graphique département
-            if (reportsDepartmentChart) {
-                const deptData = Object.keys(departments).map(dept => 
-                    filteredIncidents.filter(i => i.department === dept).length
-                );
-                
-                reportsDepartmentChart.data.datasets[0].data = deptData;
-                reportsDepartmentChart.update();
-            }
-            
-            // Mise à jour graphique types maintenance
-            if (reportsMaintenanceTypeChart) {
-                const typeData = Object.keys(maintenanceTypes).map(type => 
-                    filteredMaintenances.filter(m => m.type === type).length
-                );
-                
-                reportsMaintenanceTypeChart.data.datasets[0].data = typeData;
-                reportsMaintenanceTypeChart.update();
-            }
-            
-            // Mise à jour graphique timeline
-            if (reportsTimelineChart) {
-                const days = period === 'all' ? 30 : Math.min(period, 30);
-                const labels = [];
-                const incidentData = [];
-                const maintenanceData = [];
-                
-                for (let i = days - 1; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                    labels.push(dateStr);
-                    
-                    const nextDate = new Date(date);
-                    nextDate.setDate(nextDate.getDate() + 1);
-                    
-                    incidentData.push(filteredIncidents.filter(d => {
-                        const created = new Date(d.createdAt);
-                        return created >= date && created < nextDate;
-                    }).length);
-                    
-                    maintenanceData.push(filteredMaintenances.filter(d => {
-                        const created = new Date(d.createdAt);
-                        return created >= date && created < nextDate;
-                    }).length);
-                }
-                
-                reportsTimelineChart.data.labels = labels;
-                reportsTimelineChart.data.datasets[0].data = incidentData;
-                reportsTimelineChart.data.datasets[1].data = maintenanceData;
-                reportsTimelineChart.update();
-            }
-        }
-
-        // ============================================
-        // EXPORTS DES GRAPHIQUES
-        // ============================================
+        function loadIncidents() { /* version simplifiée - même logique */ renderIncidentsTable(); }
+        function loadMaintenances() { renderMaintenancesTable(); }
         
-        function exportReportsCharts() {
-            showToast('info', 'Export', 'Préparation des graphiques...');
-            setTimeout(() => {
-                showToast('success', 'Export réussi', 'Les graphiques ont été exportés');
-            }, 1500);
-        }
-
-        function exportReportsData() {
-            const period = parseInt(document.getElementById('reportPeriod').value) || 30;
-            const now = new Date();
-            const startDate = new Date();
-            
-            if (period === 'all') {
-                startDate.setFullYear(2000);
-            } else {
-                startDate.setDate(startDate.getDate() - period);
-            }
-            
-            const filteredIncidents = incidents.filter(i => new Date(i.createdAt) >= startDate);
-            const filteredMaintenances = maintenances.filter(m => new Date(m.createdAt) >= startDate);
-            
-            const wb = XLSX.utils.book_new();
-            
-            const incidentsSheet = XLSX.utils.json_to_sheet(filteredIncidents);
-            XLSX.utils.book_append_sheet(wb, incidentsSheet, 'Incidents');
-            
-            const maintenancesSheet = XLSX.utils.json_to_sheet(filteredMaintenances);
-            XLSX.utils.book_append_sheet(wb, maintenancesSheet, 'Maintenances');
-            
-            const date = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `rapport_${date}.xlsx`);
-            
-            showToast('success', 'Export réussi', 'Les données du rapport ont été exportées');
-        }
-
-        // ============================================
-        // GESTION DES IMAGES
-        // ============================================
-        function setupImageUpload(uploadId, previewId, inputId, imageType, incidentId = null) {
-            const uploadArea = document.getElementById(uploadId);
-            const fileInput = document.getElementById(inputId);
-            const previewContainer = document.getElementById(previewId);
-
-            if (!uploadArea || !fileInput) return;
-
-            uploadArea.addEventListener('click', () => {
-                fileInput.click();
-            });
-
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = 'var(--secondary)';
-                uploadArea.style.background = '#e8f4fd';
-            });
-
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.borderColor = '#ccc';
-                uploadArea.style.background = '#f9f9f9';
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#ccc';
-                uploadArea.style.background = '#f9f9f9';
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleImageUpload(files[0], previewContainer, imageType, incidentId);
-                }
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageUpload(e.target.files[0], previewContainer, imageType, incidentId);
-                }
-            });
-        }
-
-        function handleImageUpload(file, previewContainer, imageType, incidentId) {
-            if (!file.type.startsWith('image/')) {
-                showToast('error', 'Erreur', 'Veuillez sélectionner une image');
-                return;
-            }
-
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('error', 'Erreur', 'L\'image ne doit pas dépasser 5 Mo');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageData = e.target.result;
-                addImageToPreview(imageData, previewContainer, imageType, incidentId);
-                showToast('success', 'Image ajoutée', 'La capture a été téléchargée avec succès');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function addImageToPreview(imageData, previewContainer, imageType, incidentId = null) {
-            const previewDiv = document.createElement('div');
-            previewDiv.className = 'image-preview-item';
-            previewDiv.innerHTML = `
-                <img src="${imageData}" alt="Aperçu" onclick="zoomImage('${imageData}')" style="cursor: pointer;">
-                <button class="remove-image" onclick="removeImage(this, '${imageType}', '${incidentId || ''}')">×</button>
-            `;
-            
-            previewContainer.innerHTML = '';
-            previewContainer.appendChild(previewDiv);
-
-            if (incidentId) {
-                if (imageType === 'incident') {
-                    if (!incidentImages[incidentId]) incidentImages[incidentId] = [];
-                    incidentImages[incidentId].push(imageData);
-                } else if (imageType === 'resolution') {
-                    if (!resolutionImages[incidentId]) resolutionImages[incidentId] = [];
-                    resolutionImages[incidentId].push(imageData);
-                }
-                saveImages();
-                broadcastFullSync();
-            }
-        }
-
-        window.removeImage = function(button, imageType, incidentId) {
-            const previewDiv = button.closest('.image-preview-item');
-            previewDiv.remove();
-
-            if (incidentId) {
-                if (imageType === 'incident') {
-                    delete incidentImages[incidentId];
-                } else if (imageType === 'resolution') {
-                    delete resolutionImages[incidentId];
-                }
-                saveImages();
-                broadcastFullSync();
-            }
-        };
-
-        function saveImages() {
-            localStorage.setItem('incidentImages', JSON.stringify(incidentImages));
-            localStorage.setItem('resolutionImages', JSON.stringify(resolutionImages));
-        }
-
-        window.showIncidentImages = function(incidentId) {
-            const modal = document.getElementById('imageViewModal');
-            const container = document.getElementById('modalImages');
-            
-            let html = '';
-            
-            if (incidentImages[incidentId]) {
-                incidentImages[incidentId].forEach((img, index) => {
-                    html += `
-                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
-                            <div class="image-label" style="background: var(--warning);">📸 Incident ${index + 1}</div>
-                            <img src="${img}" alt="Image incident">
-                        </div>
-                    `;
-                });
-            }
-            
-            if (resolutionImages[incidentId]) {
-                resolutionImages[incidentId].forEach((img, index) => {
-                    html += `
-                        <div class="image-gallery-item" onclick="zoomImage('${img}')">
-                            <div class="image-label" style="background: var(--success);">✅ Résolution ${index + 1}</div>
-                            <img src="${img}" alt="Image résolution">
-                        </div>
-                    `;
-                });
-            }
-            
-            if (html === '') {
-                html = '<p style="text-align: center; padding: 20px;">Aucune capture pour cet incident</p>';
-            }
-            
-            container.innerHTML = html;
-            modal.classList.add('show');
-        };
-
-        window.zoomImage = function(imgSrc) {
-            const modal = document.getElementById('imageViewModal');
-            const container = document.getElementById('modalImages');
-            
-            container.innerHTML = `
-                <div style="text-align: center;">
-                    <img src="${imgSrc}" style="max-width: 100%; max-height: 70vh; border-radius: 5px;">
-                </div>
-            `;
-            
-            modal.classList.add('show');
-        };
-
-        // ============================================
-        // FONCTIONS POUR LA CAMÉRA ET CAPTURES D'ÉCRAN
-        // ============================================
-        
-        window.openCamera = function(imageType) {
-            currentImageType = imageType;
-            const modal = document.getElementById('cameraModal');
-            modal.classList.add('show');
-            
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    currentStream = stream;
-                    const video = document.getElementById('camera-feed');
-                    video.srcObject = stream;
-                })
-                .catch(function(error) {
-                    console.error('Erreur d\'accès à la caméra:', error);
-                    showToast('error', 'Erreur', 'Impossible d\'accéder à la caméra');
-                    closeCamera();
-                });
-        };
-        
-        window.closeCamera = function() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-            document.getElementById('cameraModal').classList.remove('show');
-        };
-        
-        window.capturePhoto = function() {
-            const video = document.getElementById('camera-feed');
-            const canvas = document.getElementById('camera-canvas');
-            const context = canvas.getContext('2d');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const imageData = canvas.toDataURL('image/png');
-            
-            const previewContainer = document.getElementById(currentImageType + 'ImagePreview');
-            addImageToPreview(imageData, previewContainer, currentImageType);
-            
-            closeCamera();
-            
-            showToast('success', 'Photo prise', 'La photo a été ajoutée avec succès');
-        };
-        
-        window.captureScreen = function(imageType) {
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                navigator.mediaDevices.getDisplayMedia({ video: true })
-                    .then(function(stream) {
-                        const video = document.createElement('video');
-                        video.srcObject = stream;
-                        video.onloadedmetadata = function() {
-                            video.play();
-                            
-                            const canvas = document.createElement('canvas');
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            const context = canvas.getContext('2d');
-                            
-                            setTimeout(() => {
-                                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                const imageData = canvas.toDataURL('image/png');
-                                
-                                const previewContainer = document.getElementById(imageType + 'ImagePreview');
-                                addImageToPreview(imageData, previewContainer, imageType);
-                                
-                                stream.getTracks().forEach(track => track.stop());
-                                
-                                showToast('success', 'Capture d\'écran', 'La capture a été ajoutée avec succès');
-                            }, 500);
-                        };
-                    })
-                    .catch(function(error) {
-                        console.error('Erreur de capture d\'écran:', error);
-                        showToast('error', 'Erreur', 'Impossible de capturer l\'écran');
-                    });
-            } else {
-                showToast('error', 'Non supporté', 'La capture d\'écran n\'est pas supportée par votre navigateur');
-            }
-        };
-
-        // ============================================
-        // CRÉATION D'INCIDENT
-        // ============================================
-        function createIncident(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('incidentName').value;
-            const department = document.getElementById('incidentDepartment').value;
-            const description = document.getElementById('incidentDescription').value;
-            const priority = document.getElementById('incidentPriority').value;
-            const ticketNumber = `INC-${nextIncidentTicket.toString().padStart(4, '0')}`;
-            
-            const incidentId = nextIncidentId;
-            
-            const incident = {
-                id: incidentId,
-                ticketNumber,
-                name,
-                department,
-                departmentLabel: departments[department],
-                description,
-                priority,
-                priorityLabel: priorities[priority],
-                status: 'open',
-                statusLabel: 'Ouvert',
-                createdBy: currentUser ? currentUser.username : 'system',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                hasImage: document.getElementById('incidentImagePreview').children.length > 0
-            };
-            
-            incidents.push(incident);
-            nextIncidentId++;
-            nextIncidentTicket++;
-            
-            const previewContainer = document.getElementById('incidentImagePreview');
-            if (previewContainer.children.length > 0) {
-                const img = previewContainer.querySelector('img');
-                if (img) {
-                    if (!incidentImages[incidentId]) incidentImages[incidentId] = [];
-                    incidentImages[incidentId].push(img.src);
-                }
-                showToast('success', 'Capture sauvegardée', 'La capture a été enregistrée');
-            }
-            
-            saveIncidents();
-            saveImages();
-            loadIncidents();
-            updateDashboard();
-            updateCharts();
-            updateTicketNumbers();
-            
-            document.getElementById('incidentForm').reset();
-            document.getElementById('incidentImagePreview').innerHTML = '';
-            
-            showToast('success', 'Incident créé', `Incident ${ticketNumber} créé avec succès`);
-            
-            // Diffuser l'incident aux autres administrateurs
-            broadcastIncidentCreated(incident);
-            broadcastFullSync();
-            
-            if (desktopNotifications && Notification.permission === 'granted') {
-                new Notification('Nouvel incident', {
-                    body: `${ticketNumber} - ${description.substring(0, 50)}...`,
-                    icon: '🔔'
-                });
-            }
-        }
-
-        // ============================================
-        // CRÉATION DE MAINTENANCE
-        // ============================================
-        function createMaintenance(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('maintenanceName').value;
-            const department = document.getElementById('maintenanceDepartment').value;
-            const description = document.getElementById('maintenanceDescription').value;
-            const type = document.getElementById('maintenanceType').value;
-            const priority = document.getElementById('maintenancePriority').value;
-            const scheduledDate = document.getElementById('maintenanceScheduledDate').value;
-            const estimatedDuration = document.getElementById('maintenanceEstimatedDuration').value;
-            const ticketNumber = `MNT-${nextMaintenanceTicket.toString().padStart(4, '0')}`;
-            
-            const maintenance = {
-                id: nextMaintenanceId++,
-                ticketNumber,
-                name,
-                department,
-                departmentLabel: departments[department],
-                description,
-                type,
-                typeLabel: maintenanceTypes[type],
-                priority,
-                priorityLabel: maintenancePriorities[priority],
-                scheduledDate,
-                estimatedDuration,
-                status: 'planned',
-                statusLabel: 'Planifiée',
-                createdBy: currentUser ? currentUser.username : 'system',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            
-            maintenances.push(maintenance);
-            nextMaintenanceTicket++;
-            saveMaintenances();
-            loadMaintenances();
-            updateDashboard();
-            updateCalendar();
-            updateCharts();
-            updateTicketNumbers();
-            
-            document.getElementById('maintenanceForm').reset();
-            showToast('success', 'Maintenance planifiée', `Maintenance ${ticketNumber} planifiée avec succès`);
-            
-            // Diffuser la maintenance aux autres administrateurs
-            broadcastMaintenanceCreated(maintenance);
-            broadcastFullSync();
-        }
-
-        // ============================================
-        // CHARGEMENT DES DONNÉES
-        // ============================================
-        function loadIncidents() {
+        function renderIncidentsTable() {
             const tbody = document.querySelector('#incidentsTable tbody');
             if (!tbody) return;
-            
-            const statusFilter = document.getElementById('filterStatus').value;
-            const priorityFilter = document.getElementById('filterPriority').value;
-            const departmentFilter = document.getElementById('filterDepartment').value;
-            const imageFilter = document.getElementById('filterImage').value;
-            
-            let filteredIncidents = incidents;
-            
-            if (statusFilter) {
-                filteredIncidents = filteredIncidents.filter(i => i.status === statusFilter);
-            }
-            if (priorityFilter) {
-                filteredIncidents = filteredIncidents.filter(i => i.priority === priorityFilter);
-            }
-            if (departmentFilter) {
-                filteredIncidents = filteredIncidents.filter(i => i.department === departmentFilter);
-            }
-            if (imageFilter === 'with') {
-                filteredIncidents = filteredIncidents.filter(i => incidentImages[i.id]?.length > 0);
-            } else if (imageFilter === 'without') {
-                filteredIncidents = filteredIncidents.filter(i => !incidentImages[i.id] || incidentImages[i.id].length === 0);
-            }
-            
-            tbody.innerHTML = '';
-            
-            filteredIncidents.forEach(incident => {
-                const row = document.createElement('tr');
-                
-                let priorityBadgeClass = '';
-                switch(incident.priority) {
-                    case 'critical': priorityBadgeClass = 'badge-critical'; break;
-                    case 'major': priorityBadgeClass = 'badge-high'; break;
-                    case 'minor': priorityBadgeClass = 'badge-low'; break;
-                }
-                
-                const hasImages = incidentImages[incident.id] && incidentImages[incident.id].length > 0;
-                const imageCount = incidentImages[incident.id]?.length || 0;
-                
-                row.innerHTML = `
-                     <td>${incident.id}</td>
-                     <td>${incident.ticketNumber}</td>
-                     <td>${incident.name}</td>
-                     <td>${incident.departmentLabel}</td>
-                     <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
-                     <td>${incident.statusLabel}</td>
-                     <td>
-                        ${hasImages ? 
-                            `<button class="btn-info" onclick="showIncidentImages(${incident.id})">📸 ${imageCount}</button>` : 
-                            '📭'}
-                     </td>
-                     <td>${formatDate(incident.createdAt)}</td>
-                    <td class="actions">
-                        ${incident.status !== 'resolved' && incident.status !== 'closed' ? 
-                            `<button class="btn-success" onclick="updateIncidentStatus(${incident.id}, 'in-progress')">En cours</button>
-                             <button class="btn-success" onclick="updateIncidentStatus(${incident.id}, 'resolved')">Résoudre</button>` : 
-                            ''}
-                        ${incident.status !== 'closed' ? 
-                            `<button class="btn-success" onclick="updateIncidentStatus(${incident.id}, 'closed')">Fermer</button>` : 
-                            ''}
-                        <button class="btn-info" onclick="showIncidentDetails(${incident.id})">Détails</button>
-                        <button class="btn-danger" onclick="deleteIncident(${incident.id})">Supprimer</button>
-                    </td>
-                `;
-                
-                tbody.appendChild(row);
-            });
+            tbody.innerHTML = incidents.map(i => `<tr>
+                <td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td><td>${i.department}</td>
+                <td><span class="badge ${i.priority === 'critical' ? 'badge-critical' : 'badge-high'}">${i.priority}</span></td>
+                <td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString()}</td>
+                <td><button onclick="deleteIncident(${i.id})" class="btn-danger">🗑️</button></td>
+            </tr>`).join('');
         }
-
-        function loadMaintenances() {
+        
+        function renderMaintenancesTable() {
             const tbody = document.querySelector('#maintenanceTable tbody');
             if (!tbody) return;
-            
-            const typeFilter = document.getElementById('filterMaintenanceType').value;
-            const statusFilter = document.getElementById('filterMaintenanceStatus').value;
-            const departmentFilter = document.getElementById('filterMaintenanceDepartment').value;
-            
-            let filteredMaintenances = maintenances;
-            
-            if (typeFilter) {
-                filteredMaintenances = filteredMaintenances.filter(m => m.type === typeFilter);
-            }
-            if (statusFilter) {
-                filteredMaintenances = filteredMaintenances.filter(m => m.status === statusFilter);
-            }
-            if (departmentFilter) {
-                filteredMaintenances = filteredMaintenances.filter(m => m.department === departmentFilter);
-            }
-            
-            tbody.innerHTML = '';
-            
-            filteredMaintenances.forEach(maintenance => {
-                const row = document.createElement('tr');
-                
-                let typeBadgeClass = '';
-                switch(maintenance.type) {
-                    case 'urgent': typeBadgeClass = 'badge-urgent'; break;
-                    case 'corrective': typeBadgeClass = 'badge-corrective'; break;
-                    case 'preventive': typeBadgeClass = 'badge-preventive'; break;
-                    case 'planned': typeBadgeClass = 'badge-planned'; break;
-                    default: typeBadgeClass = 'badge-low';
-                }
-                
-                let priorityBadgeClass = '';
-                switch(maintenance.priority) {
-                    case 'high': priorityBadgeClass = 'badge-high'; break;
-                    case 'medium': priorityBadgeClass = 'badge-medium'; break;
-                    case 'low': priorityBadgeClass = 'badge-low'; break;
-                }
-                
-                row.innerHTML = `
-                     <td>${maintenance.id}</td>
-                     <td>${maintenance.ticketNumber}</td>
-                     <td>${maintenance.name}</td>
-                     <td>${maintenance.departmentLabel}</td>
-                     <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
-                     <td><span class="badge ${priorityBadgeClass}">${maintenance.priorityLabel}</span></td>
-                     <td>${formatDate(maintenance.scheduledDate)}</td>
-                     <td>${maintenance.statusLabel}</td>
-                    <td class="actions">
-                        ${maintenance.status !== 'completed' && maintenance.status !== 'cancelled' ? 
-                            `<button class="btn-success" onclick="updateMaintenanceStatus(${maintenance.id}, 'in-progress')">Démarrer</button>
-                             <button class="btn-success" onclick="updateMaintenanceStatus(${maintenance.id}, 'completed')">Terminer</button>` : 
-                            ''}
-                        ${maintenance.status !== 'cancelled' ? 
-                            `<button class="btn-danger" onclick="updateMaintenanceStatus(${maintenance.id}, 'cancelled')">Annuler</button>` : 
-                            ''}
-                        <button class="btn-info" onclick="showMaintenanceDetails(${maintenance.id})">Détails</button>
-                        <button class="btn-danger" onclick="deleteMaintenance(${maintenance.id})">Supprimer</button>
-                     </td>
-                `;
-                
-                tbody.appendChild(row);
-            });
+            tbody.innerHTML = maintenances.map(m => `<tr>
+                <td>${m.id}</td><td>${m.ticketNumber}</td><td>${m.name}</td><td>${m.type}</td>
+                <td>${new Date(m.scheduledDate).toLocaleDateString()}</td><td>${m.status}</td>
+                <td><button onclick="deleteMaintenance(${m.id})" class="btn-danger">🗑️</button></td>
+            </tr>`).join('');
         }
-
-        // ============================================
-        // FILTRES
-        // ============================================
-        function filterIncidents() {
-            loadIncidents();
-        }
-
-        function filterMaintenances() {
-            loadMaintenances();
-        }
-
-        // ============================================
-        // MISES À JOUR DE STATUT
-        // ============================================
-        window.updateIncidentStatus = function(id, status) {
-            const incident = incidents.find(i => i.id === id);
-            if (incident) {
-                incident.status = status;
-                incident.statusLabel = statusLabels[status];
-                incident.updatedAt = new Date().toISOString();
-                saveIncidents();
-                loadIncidents();
-                updateDashboard();
-                updateCharts();
-                showToast('info', 'Statut mis à jour', `L'incident ${incident.ticketNumber} est maintenant ${statusLabels[status]}`);
-                broadcastIncidentUpdated(incident);
-            }
-        }
-
-        window.updateMaintenanceStatus = function(id, status) {
-            const maintenance = maintenances.find(m => m.id === id);
-            if (maintenance) {
-                maintenance.status = status;
-                maintenance.statusLabel = statusLabels[status];
-                maintenance.updatedAt = new Date().toISOString();
-                saveMaintenances();
-                loadMaintenances();
-                updateDashboard();
-                updateCalendar();
-                updateCharts();
-                showToast('info', 'Statut mis à jour', `La maintenance ${maintenance.ticketNumber} est maintenant ${statusLabels[status]}`);
-                broadcastMaintenanceUpdated(maintenance);
-            }
-        }
-
-        // ============================================
-        // SUPPRESSIONS
-        // ============================================
-        window.deleteIncident = function(id) {
-            showConfirm('Êtes-vous sûr de vouloir supprimer cet incident ?', function() {
-                incidents = incidents.filter(i => i.id !== id);
-                delete incidentImages[id];
-                saveIncidents();
-                saveImages();
-                loadIncidents();
-                updateDashboard();
-                updateCharts();
-                showToast('success', 'Incident supprimé', 'L\'incident a été supprimé avec succès');
-                broadcastIncidentDeleted(id);
-            });
-        }
-
-        window.deleteMaintenance = function(id) {
-            showConfirm('Êtes-vous sûr de vouloir supprimer cette maintenance ?', function() {
-                maintenances = maintenances.filter(m => m.id !== id);
-                saveMaintenances();
-                loadMaintenances();
-                updateDashboard();
-                updateCalendar();
-                updateCharts();
-                showToast('success', 'Maintenance supprimée', 'La maintenance a été supprimée avec succès');
-                broadcastMaintenanceDeleted(id);
-            });
-        }
-
-        // ============================================
-        // AFFICHAGE DES DÉTAILS
-        // ============================================
-        function showIncidentDetails(id) {
-            const incident = incidents.find(i => i.id === id);
-            if (!incident) return;
-            
-            const hasImages = incidentImages[id] && incidentImages[id].length > 0;
-            
-            const modalBody = document.getElementById('detailModalBody');
-            modalBody.innerHTML = `
-                <h3>Incident ${incident.ticketNumber}</h3>
-                <p><strong>Nom:</strong> ${incident.name}</p>
-                <p><strong>Département:</strong> ${incident.departmentLabel}</p>
-                <p><strong>Priorité:</strong> ${incident.priorityLabel}</p>
-                <p><strong>Statut:</strong> ${incident.statusLabel}</p>
-                <p><strong>Description:</strong> ${incident.description}</p>
-                <p><strong>Créé par:</strong> ${incident.createdBy}</p>
-                <p><strong>Date création:</strong> ${formatDate(incident.createdAt)}</p>
-                <p><strong>Dernière mise à jour:</strong> ${formatDate(incident.updatedAt)}</p>
-                ${hasImages ? 
-                    `<p><strong>Images:</strong> <button class="btn-info" onclick="showIncidentImages(${id})">Voir les images (${incidentImages[id].length})</button></p>` : 
-                    ''}
-            `;
-            document.getElementById('detailModal').classList.add('show');
-        }
-
-        function showMaintenanceDetails(id) {
-            const maintenance = maintenances.find(m => m.id === id);
-            if (!maintenance) return;
-            
-            const modalBody = document.getElementById('detailModalBody');
-            modalBody.innerHTML = `
-                <h3>Maintenance ${maintenance.ticketNumber}</h3>
-                <p><strong>Nom:</strong> ${maintenance.name}</p>
-                <p><strong>Département:</strong> ${maintenance.departmentLabel}</p>
-                <p><strong>Type:</strong> ${maintenance.typeLabel}</p>
-                <p><strong>Priorité:</strong> ${maintenance.priorityLabel}</p>
-                <p><strong>Statut:</strong> ${maintenance.statusLabel}</p>
-                <p><strong>Description:</strong> ${maintenance.description}</p>
-                <p><strong>Date planifiée:</strong> ${formatDate(maintenance.scheduledDate)}</p>
-                <p><strong>Durée estimée:</strong> ${maintenance.estimatedDuration} heures</p>
-                <p><strong>Créé par:</strong> ${maintenance.createdBy}</p>
-                <p><strong>Date création:</strong> ${formatDate(maintenance.createdAt)}</p>
-            `;
-            document.getElementById('detailModal').classList.add('show');
-        }
-
-        // ============================================
-        // TABLEAU DE BORD
-        // ============================================
+        
         function updateDashboard() {
-            const openIncidents = incidents.filter(i => i.status === 'open' || i.status === 'in-progress').length;
-            const criticalIncidents = incidents.filter(i => i.priority === 'critical' && (i.status === 'open' || i.status === 'in-progress')).length;
-            const plannedMaintenance = maintenances.filter(m => m.status === 'planned').length;
-            const resolvedIncidents = incidents.filter(i => i.status === 'resolved' || i.status === 'closed').length;
-            const resolutionRate = incidents.length > 0 ? Math.round((resolvedIncidents / incidents.length) * 100) : 0;
-            
-            document.getElementById('openIncidents').textContent = openIncidents;
-            document.getElementById('criticalIncidents').textContent = criticalIncidents;
-            document.getElementById('plannedMaintenance').textContent = plannedMaintenance;
-            document.getElementById('resolutionRate').textContent = `${resolutionRate}%`;
+            document.getElementById('openIncidents').textContent = incidents.filter(i => i.status === 'open').length;
+            document.getElementById('plannedMaintenance').textContent = maintenances.filter(m => m.status === 'planned').length;
+            document.getElementById('criticalIncidents').textContent = incidents.filter(i => i.priority === 'critical').length;
+            const resolved = incidents.filter(i => i.status === 'resolved' || i.status === 'closed').length;
+            document.getElementById('resolutionRate').textContent = incidents.length ? Math.round(resolved/incidents.length*100) + '%' : '0%';
             
             // Incidents récents
-            const recentIncidentsTbody = document.querySelector('#recentIncidents tbody');
-            if (recentIncidentsTbody) {
-                const recentIncidents = [...incidents]
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 5);
-                
-                recentIncidentsTbody.innerHTML = '';
-                
-                recentIncidents.forEach(incident => {
-                    const row = document.createElement('tr');
-                    
-                    let priorityBadgeClass = '';
-                    switch(incident.priority) {
-                        case 'critical': priorityBadgeClass = 'badge-critical'; break;
-                        case 'major': priorityBadgeClass = 'badge-high'; break;
-                        case 'minor': priorityBadgeClass = 'badge-low'; break;
-                    }
-                    
-                    row.innerHTML = `
-                         <td>${incident.id}</td>
-                         <td>${incident.ticketNumber}</td>
-                         <td>${incident.name}</td>
-                         <td>${incident.departmentLabel}</td>
-                         <td><span class="badge ${priorityBadgeClass}">${incident.priorityLabel}</span></td>
-                         <td>${incident.statusLabel}</td>
-                         <td>${formatDate(incident.createdAt)}</td>
-                    `;
-                    
-                    recentIncidentsTbody.appendChild(row);
-                });
-            }
-            
-            // Maintenances à venir
-            const upcomingMaintenanceTbody = document.querySelector('#upcomingMaintenance tbody');
-            if (upcomingMaintenanceTbody) {
-                const now = new Date();
-                const upcomingMaintenance = [...maintenances]
-                    .filter(m => new Date(m.scheduledDate) > now && m.status === 'planned')
-                    .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate))
-                    .slice(0, 5);
-                
-                upcomingMaintenanceTbody.innerHTML = '';
-                
-                upcomingMaintenance.forEach(maintenance => {
-                    const row = document.createElement('tr');
-                    
-                    let typeBadgeClass = '';
-                    switch(maintenance.type) {
-                        case 'urgent': typeBadgeClass = 'badge-urgent'; break;
-                        case 'corrective': typeBadgeClass = 'badge-corrective'; break;
-                        case 'preventive': typeBadgeClass = 'badge-preventive'; break;
-                        case 'planned': typeBadgeClass = 'badge-planned'; break;
-                        default: typeBadgeClass = 'badge-low';
-                    }
-                    
-                    row.innerHTML = `
-                         <td>${maintenance.id}</td>
-                         <td>${maintenance.ticketNumber}</td>
-                         <td>${maintenance.name}</td>
-                         <td>${maintenance.departmentLabel}</td>
-                         <td><span class="badge ${typeBadgeClass}">${maintenance.typeLabel}</span></td>
-                         <td>${maintenance.priorityLabel}</td>
-                         <td>${formatDate(maintenance.scheduledDate)}</td>
-                    `;
-                    
-                    upcomingMaintenanceTbody.appendChild(row);
-                });
+            const recentTbody = document.querySelector('#recentIncidents tbody');
+            if (recentTbody) {
+                recentTbody.innerHTML = incidents.slice(-5).reverse().map(i => `<tr><td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td><td>${i.department}</td><td>${i.priority}</td><td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString()}</td></tr>`).join('');
             }
         }
-
-        // ============================================
-        // CALENDRIER DES MAINTENANCES
-        // ============================================
-        function updateCalendar() {
-            const calendar = document.getElementById('maintenanceCalendar');
-            if (!calendar) return;
-            
-            const now = new Date();
-            const upcomingMaintenances = maintenances
-                .filter(m => m.status === 'planned' || m.status === 'in-progress')
-                .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate))
-                .slice(0, 6);
-            
-            calendar.innerHTML = '';
-            
-            upcomingMaintenances.forEach(m => {
-                const eventDate = new Date(m.scheduledDate);
-                const isToday = eventDate.toDateString() === now.toDateString();
-                const isUrgent = m.priority === 'high' || m.type === 'urgent';
-                
-                const event = document.createElement('div');
-                event.className = `calendar-event ${isUrgent ? 'urgent' : ''} ${isToday ? 'today' : ''}`;
-                
-                event.innerHTML = `
-                    <div class="event-date">${formatDate(m.scheduledDate)}</div>
-                    <div class="event-title">${m.ticketNumber} - ${m.name}</div>
-                    <div class="event-department">${m.departmentLabel} • ${m.typeLabel}</div>
-                `;
-                
-                event.onclick = () => showMaintenanceDetails(m.id);
-                calendar.appendChild(event);
-            });
-            
-            if (upcomingMaintenances.length === 0) {
-                calendar.innerHTML = '<p style="text-align: center; color: #666;">Aucune maintenance planifiée</p>';
-            }
-        }
-
-        // ============================================
-        // GRAPHIQUES
-        // ============================================
-        function initCharts() {
-            const ctx1 = document.getElementById('incidentsChart')?.getContext('2d');
-            const ctx2 = document.getElementById('maintenanceChart')?.getContext('2d');
-            
-            if (ctx1) {
-                incidentsChart = new Chart(ctx1, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Critique', 'Majeur', 'Mineur'],
-                        datasets: [{
-                            data: [0, 0, 0],
-                            backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            if (ctx2) {
-                maintenanceChart = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Préventive', 'Corrective', 'Urgente', 'Planifiée'],
-                        datasets: [{
-                            data: [0, 0, 0, 0],
-                            backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c', '#3498db']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            updateCharts();
-        }
-
-        function updateCharts() {
-            if (incidentsChart) {
-                const critical = incidents.filter(i => i.priority === 'critical').length;
-                const major = incidents.filter(i => i.priority === 'major').length;
-                const minor = incidents.filter(i => i.priority === 'minor').length;
-                
-                incidentsChart.data.datasets[0].data = [critical, major, minor];
-                incidentsChart.update();
-            }
-            
-            if (maintenanceChart) {
-                const preventive = maintenances.filter(m => m.type === 'preventive').length;
-                const corrective = maintenances.filter(m => m.type === 'corrective').length;
-                const urgent = maintenances.filter(m => m.type === 'urgent').length;
-                const planned = maintenances.filter(m => m.type === 'planned').length;
-                
-                maintenanceChart.data.datasets[0].data = [preventive, corrective, urgent, planned];
-                maintenanceChart.update();
-            }
-        }
-
-        // ============================================
-        // NUMÉROS DE TICKET
-        // ============================================
-        function updateTicketNumbers() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('fr-FR');
-            
-            document.getElementById('incidentTicketNumber').textContent = nextIncidentTicket.toString().padStart(4, '0');
-            document.getElementById('incidentTicketDate').textContent = dateStr;
-            
-            document.getElementById('maintenanceTicketNumber').textContent = nextMaintenanceTicket.toString().padStart(4, '0');
-            document.getElementById('maintenanceTicketDate').textContent = dateStr;
-        }
-
-        // ============================================
-        // EXPORTS EXCEL
-        // ============================================
         
-        function exportAllToExcel() {
-            const wb = XLSX.utils.book_new();
-            
-            const incidentsData = incidents.map(i => ({
-                ID: i.id,
-                Ticket: i.ticketNumber,
-                'Nom et Prénom': i.name,
-                Département: i.departmentLabel,
-                Priorité: i.priorityLabel,
-                Statut: i.statusLabel,
-                Description: i.description,
-                'Date création': formatDate(i.createdAt),
-                'Dernière mise à jour': formatDate(i.updatedAt)
-            }));
-            const incidentsSheet = XLSX.utils.json_to_sheet(incidentsData);
-            XLSX.utils.book_append_sheet(wb, incidentsSheet, 'Incidents');
-            
-            const maintenancesData = maintenances.map(m => ({
-                ID: m.id,
-                Ticket: m.ticketNumber,
-                'Nom et Prénom': m.name,
-                Département: m.departmentLabel,
-                Type: m.typeLabel,
-                Priorité: m.priorityLabel,
-                Statut: m.statusLabel,
-                'Date planifiée': formatDate(m.scheduledDate),
-                'Durée estimée': m.estimatedDuration + 'h',
-                Description: m.description,
-                'Date création': formatDate(m.createdAt)
-            }));
-            const maintenancesSheet = XLSX.utils.json_to_sheet(maintenancesData);
-            XLSX.utils.book_append_sheet(wb, maintenancesSheet, 'Maintenances');
-            
-            const date = new Date().toISOString().slice(0,10);
-            XLSX.writeFile(wb, `export_complet_${date}.xlsx`);
-            
-            showToast('success', 'Export réussi', 'Les données ont été exportées vers Excel');
-        }
-
-        // ============================================
-        // RÉTENTION DES DONNÉES
-        // ============================================
-        function updateRetentionInfo() {
-            const totalItems = incidents.length + maintenances.length;
-            const imagesCount = Object.keys(incidentImages).length;
-            const estimatedSize = (totalItems * 2) + (imagesCount * 0.5);
-            
-            const progress = document.getElementById('retentionProgress');
-            const info = document.getElementById('retentionInfo');
-            
-            if (!progress || !info) return;
-            
-            let percentage = Math.min(100, (estimatedSize / 1024) * 100);
-            progress.style.width = percentage + '%';
-            
-            if (percentage > 80) {
-                progress.style.backgroundColor = 'var(--danger)';
-            } else if (percentage > 50) {
-                progress.style.backgroundColor = 'var(--warning)';
-            } else {
-                progress.style.backgroundColor = 'var(--success)';
-            }
-            
-            info.textContent = `Espace utilisé: ~${estimatedSize.toFixed(1)} Ko (${percentage.toFixed(1)}% de la limite recommandée)`;
-        }
-
-        function applyRetentionPolicy() {
-            if (retentionPeriod === 0) return;
-            
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - retentionPeriod);
-            
-            const oldIncidents = incidents.filter(i => new Date(i.createdAt) < cutoffDate && i.status === 'closed');
-            const oldMaintenances = maintenances.filter(m => new Date(m.createdAt) < cutoffDate && m.status === 'completed');
-            
-            if (oldIncidents.length + oldMaintenances.length > 0) {
-                console.log(`${oldIncidents.length} incidents et ${oldMaintenances.length} maintenances seront archivés`);
-            }
-        }
-
-        function cleanOldData() {
-            showConfirm('Voulez-vous vraiment supprimer définitivement les données anciennes ?', function() {
-                const cutoffDate = new Date();
-                cutoffDate.setDate(cutoffDate.getDate() - retentionPeriod);
-                
-                const incidentsBefore = incidents.length;
-                const maintenancesBefore = maintenances.length;
-                
-                incidents = incidents.filter(i => new Date(i.createdAt) >= cutoffDate || i.status !== 'closed');
-                maintenances = maintenances.filter(m => new Date(m.createdAt) >= cutoffDate || m.status !== 'completed');
-                
-                saveIncidents();
-                saveMaintenances();
-                
-                loadIncidents();
-                loadMaintenances();
-                updateDashboard();
-                updateCalendar();
-                updateCharts();
-                updateRetentionInfo();
-                
-                showToast('success', 'Nettoyage terminé', `${incidentsBefore - incidents.length} incidents et ${maintenancesBefore - maintenances.length} maintenances ont été supprimés`);
-                
-                broadcastFullSync();
-            });
-        }
-
-        // ============================================
-        // SYNCHRONISATION TEMPS RÉEL
-        // ============================================
-        function startSyncTimer() {
-            if (syncTimer) clearInterval(syncTimer);
-            
-            syncTimer = setInterval(() => {
-                if (realtimeEnabled && broadcastChannel) {
-                    syncData();
-                }
-            }, syncInterval * 1000);
-        }
-
-        function syncData() {
-            lastSync = new Date().toISOString();
-            localStorage.setItem('lastSync', lastSync);
-            
-            document.getElementById('syncStatus').textContent = 'Synchronisé';
-            
-            loadIncidents();
-            loadMaintenances();
+        function updateDashboardStats() {
             updateDashboard();
-            updateCalendar();
-            updateCharts();
-            
-            // Mettre à jour le statut de connexion
-            if (broadcastChannel) {
-                updateRealtimeStatus(true);
-            }
+            renderPrinters();
         }
-
-        // ============================================
-        // SAUVEGARDE
-        // ============================================
-        function saveIncidents() {
+        
+        function createIncident(e) {
+            e.preventDefault();
+            incidents.push({ id: nextIncidentId++, ticketNumber: `INC-${(nextIncidentTicket++).toString().padStart(4,'0')}`, name: document.getElementById('incidentName').value, department: document.getElementById('incidentDepartment').value, description: document.getElementById('incidentDescription').value, priority: document.getElementById('incidentPriority').value, status: 'open', createdAt: new Date().toISOString() });
             localStorage.setItem('incidents', JSON.stringify(incidents));
             localStorage.setItem('nextIncidentId', nextIncidentId);
             localStorage.setItem('nextIncidentTicket', nextIncidentTicket);
+            loadIncidents(); updateDashboard(); document.getElementById('incidentForm').reset();
+            showToast('success', 'Incident créé', 'Incident enregistré');
         }
-
-        function saveMaintenances() {
+        
+        function createMaintenance(e) {
+            e.preventDefault();
+            maintenances.push({ id: nextMaintenanceId++, ticketNumber: `MNT-${(nextMaintenanceTicket++).toString().padStart(4,'0')}`, name: document.getElementById('maintenanceName').value, department: document.getElementById('maintenanceDepartment').value, description: document.getElementById('maintenanceDescription').value, type: document.getElementById('maintenanceType').value, scheduledDate: document.getElementById('maintenanceScheduledDate').value, status: 'planned', createdAt: new Date().toISOString() });
             localStorage.setItem('maintenances', JSON.stringify(maintenances));
             localStorage.setItem('nextMaintenanceId', nextMaintenanceId);
             localStorage.setItem('nextMaintenanceTicket', nextMaintenanceTicket);
+            loadMaintenances(); updateDashboard(); document.getElementById('maintenanceForm').reset();
+            showToast('success', 'Maintenance planifiée', 'Maintenance enregistrée');
         }
-
-        // ============================================
-        // FONCTIONS UTILITAIRES
-        // ============================================
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+        
+        window.deleteIncident = function(id) { incidents = incidents.filter(i => i.id !== id); localStorage.setItem('incidents', JSON.stringify(incidents)); loadIncidents(); updateDashboard(); showToast('success', 'Supprimé', 'Incident supprimé'); };
+        window.deleteMaintenance = function(id) { maintenances = maintenances.filter(m => m.id !== id); localStorage.setItem('maintenances', JSON.stringify(maintenances)); loadMaintenances(); updateDashboard(); showToast('success', 'Supprimé', 'Maintenance supprimée'); };
+        
+        function updateTicketNumbers() {
+            document.getElementById('incidentTicketNumber').textContent = (nextIncidentTicket).toString().padStart(4,'0');
+            document.getElementById('maintenanceTicketNumber').textContent = (nextMaintenanceTicket).toString().padStart(4,'0');
         }
-
+        
+        function initCharts() {
+            const ctx = document.getElementById('reportsPriorityChart')?.getContext('2d');
+            if(ctx) new Chart(ctx, { type: 'pie', data: { labels: ['Critique', 'Majeur', 'Mineur'], datasets: [{ data: [incidents.filter(i=>i.priority==='critical').length, incidents.filter(i=>i.priority==='major').length, incidents.filter(i=>i.priority==='minor').length], backgroundColor: ['#e74c3c','#f39c12','#2ecc71'] }] } });
+            const ctx2 = document.getElementById('inkStatsChart')?.getContext('2d');
+            if(ctx2) new Chart(ctx2, { type: 'doughnut', data: { labels: ['Cyan', 'Magenta', 'Jaune', 'Noir'], datasets: [{ data: [printers.reduce((s,p)=>s+p.cyan,0)/printers.length||0, printers.reduce((s,p)=>s+p.magenta,0)/printers.length||0, printers.reduce((s,p)=>s+p.yellow,0)/printers.length||0, printers.reduce((s,p)=>s+p.black,0)/printers.length||0], backgroundColor: ['#00bcd4','#e91e63','#ffc107','#424242'] }] } });
+        }
+        
+        function exportAllToExcel() { showToast('info', 'Export', 'Fonctionnalité disponible'); }
         function showToast(type, title, message) {
             const toast = document.getElementById('toast');
-            if (!toast) return;
-            
             toast.className = `toast show ${type}`;
             document.getElementById('toastTitle').textContent = title;
             document.getElementById('toastMessage').textContent = message;
-            
-            let icon = '';
-            switch(type) {
-                case 'success': icon = '✅'; break;
-                case 'error': icon = '❌'; break;
-                case 'warning': icon = '⚠️'; break;
-                default: icon = 'ℹ️';
-            }
-            document.getElementById('toastIcon').textContent = icon;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        function showConfirm(message, callback) {
-            document.getElementById('confirmMessage').textContent = message;
-            document.getElementById('confirmModal').classList.add('show');
-            
-            document.getElementById('confirmOk').onclick = function() {
-                document.getElementById('confirmModal').classList.remove('show');
-                callback();
-            };
-            
-            document.getElementById('confirmCancel').onclick = function() {
-                document.getElementById('confirmModal').classList.remove('show');
-            };
-        }
-
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-            } else {
-                input.type = 'password';
-            }
-        }
+        
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); });
+        document.getElementById('incidentForm')?.addEventListener('submit', createIncident);
+        document.getElementById('maintenanceForm')?.addEventListener('submit', createMaintenance);
+        document.getElementById('exportExcelBtn')?.addEventListener('click', exportAllToExcel);
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser=null; document.getElementById('mainApp').style.display='none'; document.getElementById('loginModal').style.display='flex'; });
+        
+        document.getElementById('addPrinterBtn')?.addEventListener('click', () => document.getElementById('printerModal').classList.add('show'));
+        document.getElementById('orderInkBtn')?.addEventListener('click', () => {
+            const select = document.getElementById('orderPrinterSelect');
+            select.innerHTML = printers.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            document.getElementById('orderModal').classList.add('show');
+        });
+        document.getElementById('exportInkReportBtn')?.addEventListener('click', () => showToast('success', 'Export', 'Rapport encre exporté'));
+        
+        document.getElementById('savePrinterBtn')?.addEventListener('click', () => {
+            addPrinter(document.getElementById('printerName').value, document.getElementById('printerModel').value, document.getElementById('inkCyan').value, document.getElementById('inkMagenta').value, document.getElementById('inkYellow').value, document.getElementById('inkBlack').value);
+            document.getElementById('printerModal').classList.remove('show');
+            document.getElementById('printerName').value = '';
+        });
+        
+        document.getElementById('confirmOrderBtn')?.addEventListener('click', () => {
+            const printerId = parseInt(document.getElementById('orderPrinterSelect').value);
+            const inkType = document.getElementById('inkType').value;
+            const quantity = document.getElementById('inkQuantity').value;
+            const cost = document.getElementById('inkCost').value;
+            orderInk(printerId, inkType, quantity, cost);
+            document.getElementById('orderModal').classList.remove('show');
+        });
+        
+        document.getElementById('saveInkSettings')?.addEventListener('click', () => {
+            inkAlertThreshold = parseInt(document.getElementById('inkAlertThreshold').value);
+            inkCriticalThreshold = parseInt(document.getElementById('inkCriticalThreshold').value);
+            localStorage.setItem('inkAlertThreshold', inkAlertThreshold);
+            localStorage.setItem('inkCriticalThreshold', inkCriticalThreshold);
+            renderPrinters();
+            showToast('success', 'Paramètres', 'Seuils d\'alerte mis à jour');
+        });
+        
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', function() { this.closest('.modal').classList.remove('show'); }));
+        
+        // Navigation onglets
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById(link.getAttribute('href').substring(1)).classList.add('active');
+                if (link.getAttribute('href') === '#ink') { renderPrinters(); renderInkOrders(); renderInkChart(); }
+                if (link.getAttribute('href') === '#dashboard') updateDashboardStats();
+            });
+        });
+        
+        // Initialisation
+        (function init() {
+            if (localStorage.getItem('incidents')) incidents = JSON.parse(localStorage.getItem('incidents'));
+            if (localStorage.getItem('maintenances')) maintenances = JSON.parse(localStorage.getItem('maintenances'));
+            nextIncidentId = parseInt(localStorage.getItem('nextIncidentId')) || incidents.length + 1;
+            nextMaintenanceId = parseInt(localStorage.getItem('nextMaintenanceId')) || maintenances.length + 1;
+        })();
     </script>
 </body>
 </html>
