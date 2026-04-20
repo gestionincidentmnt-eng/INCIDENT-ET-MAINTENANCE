@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion IT - Encre & Support</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>Gestion d'Incidents - Encre & Support Technique & Maintenance IT</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -249,7 +249,6 @@
         .badge-resolved { background-color: #2ecc71; color: white; }
         .badge-closed { background-color: #95a5a6; color: white; }
         
-        /* Styles pour les imprimantes */
         .printer-card {
             background: white;
             border-radius: 10px;
@@ -460,6 +459,13 @@
             font-size: 13px;
         }
         
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
         @media (max-width: 768px) {
             .nav-tabs { flex-direction: column; }
             .charts-grid { grid-template-columns: 1fr; }
@@ -499,7 +505,7 @@
 
     <div class="container" id="mainApp" style="display: none;">
         <header>
-            <h1>Gestion d'Incidents et Maintenance IT</h1>
+            <h1>📋 Gestion d'Incidents - Encre & Support Technique & Maintenance IT</h1>
             <div class="header-actions">
                 <div class="user-info">
                     <div class="user-avatar" id="userAvatar">A</div>
@@ -511,7 +517,7 @@
                         </div>
                     </div>
                 </div>
-                <button id="exportExcelBtn" class="btn-success">📊 Export Excel</button>
+                <button id="exportExcelBtn" class="btn-success">📊 Export Excel Complet</button>
                 <button id="logoutBtn" class="btn-danger">🚪 Déconnexion</button>
             </div>
         </header>
@@ -689,7 +695,14 @@
         
         <!-- RAPPORTS -->
         <div id="reports" class="tab-content">
-            <div class="card"><h2>📈 Rapports analytiques</h2>
+            <div class="card">
+                <h2>📈 Rapports analytiques</h2>
+                <div class="export-buttons">
+                    <button id="exportIncidentsReport" class="btn-info">📄 Export Incidents</button>
+                    <button id="exportSupportReport" class="btn-info">📄 Export Support</button>
+                    <button id="exportPrintersReport" class="btn-info">📄 Export Imprimantes</button>
+                    <button id="exportFullReport" class="btn-success">📊 Export Rapport Complet</button>
+                </div>
                 <div class="charts-grid">
                     <div class="chart-container"><canvas id="reportsPriorityChart"></canvas></div>
                     <div class="chart-container"><canvas id="supportTypeChart"></canvas></div>
@@ -740,13 +753,13 @@
     <div id="toast" class="toast"><div id="toastIcon"></div><div><div id="toastTitle"></div><div id="toastMessage"></div></div></div>
 
     <script>
-        // ==================== DICTIONNAIRE DES DÉPARTEMENTS ====================
+        // Dictionnaire des départements
         const departmentLabels = {
             dsi: "DSI", dsj: "DSJ", dsp: "DSP", dpsp: "DPSP", drh: "DRH",
             dga: "DGA", dg: "DG", dcom: "DCOM", dplmg: "DPLMG", daf: "DAF", cp: "CP"
         };
         
-        // ==================== DONNÉES PRINCIPALES ====================
+        // Données principales
         let incidents = JSON.parse(localStorage.getItem('incidents')) || [];
         let maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
         let printers = JSON.parse(localStorage.getItem('printers')) || [];
@@ -786,10 +799,13 @@
             saveSupportTickets();
         }
         
-        // ==================== FONCTIONS ENCRE SIMPLIFIÉES ====================
+        // Fonctions de sauvegarde
+        function saveIncidents() { localStorage.setItem('incidents', JSON.stringify(incidents)); }
+        function saveMaintenances() { localStorage.setItem('maintenances', JSON.stringify(maintenances)); }
         function savePrinters() { localStorage.setItem('printers', JSON.stringify(printers)); }
         function saveSupportTickets() { localStorage.setItem('supportTickets', JSON.stringify(supportTickets)); }
         
+        // Fonctions encre
         function calculateDaysSince(dateString) {
             const lastDate = new Date(dateString);
             const today = new Date();
@@ -898,7 +914,7 @@
                 type: 'bar',
                 data: {
                     labels: Object.keys(departments),
-                    datasets: [{ label: 'Nombre d\'imprimantes', data: Object.values(departments), backgroundColor: '#3498db' }]
+                    datasets: [{ label: "Nombre d'imprimantes", data: Object.values(departments), backgroundColor: '#3498db' }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
@@ -944,7 +960,7 @@
             showToast('success', 'Ajouté', `Imprimante ${name} ajoutée`);
         }
         
-        // ==================== FONCTIONS SUPPORT ====================
+        // Fonctions support
         function renderSupportTickets() {
             const tbody = document.querySelector('#supportTable tbody');
             if (!tbody) return;
@@ -972,7 +988,7 @@
                         ${t.status !== 'resolved' && t.status !== 'closed' ? `<button onclick="updateSupportStatus(${t.id}, 'in-progress')" class="btn-warning btn-sm">En cours</button>
                         <button onclick="updateSupportStatus(${t.id}, 'resolved')" class="btn-success btn-sm">Résoudre</button>` : ''}
                         <button onclick="deleteSupportTicket(${t.id})" class="btn-danger btn-sm">🗑️</button>
-                    </td>
+                     </td>
                 </tr>`;
             }).join('');
             
@@ -1039,7 +1055,7 @@
             document.getElementById('supportTicketNumber').textContent = nextSupportTicket.toString().padStart(4, '0');
         }
         
-        // ==================== FONCTIONS INCIDENTS/MAINTENANCE ====================
+        // Fonctions incidents/maintenance
         function renderIncidentsTable() {
             const tbody = document.querySelector('#incidentsTable tbody');
             if (!tbody) return;
@@ -1097,7 +1113,7 @@
                 status: 'open', 
                 createdAt: new Date().toISOString() 
             });
-            localStorage.setItem('incidents', JSON.stringify(incidents));
+            saveIncidents();
             localStorage.setItem('nextIncidentId', nextIncidentId);
             localStorage.setItem('nextIncidentTicket', nextIncidentTicket);
             renderIncidentsTable(); updateDashboard(); document.getElementById('incidentForm').reset();
@@ -1118,7 +1134,7 @@
                 status: 'planned', 
                 createdAt: new Date().toISOString() 
             });
-            localStorage.setItem('maintenances', JSON.stringify(maintenances));
+            saveMaintenances();
             localStorage.setItem('nextMaintenanceId', nextMaintenanceId);
             localStorage.setItem('nextMaintenanceTicket', nextMaintenanceTicket);
             renderMaintenancesTable(); updateDashboard(); document.getElementById('maintenanceForm').reset();
@@ -1126,15 +1142,109 @@
             showToast('success', 'Maintenance planifiée', 'Maintenance enregistrée');
         }
         
-        window.deleteIncident = function(id) { incidents = incidents.filter(i => i.id !== id); localStorage.setItem('incidents', JSON.stringify(incidents)); renderIncidentsTable(); updateDashboard(); showToast('success', 'Supprimé', 'Incident supprimé'); };
-        window.deleteMaintenance = function(id) { maintenances = maintenances.filter(m => m.id !== id); localStorage.setItem('maintenances', JSON.stringify(maintenances)); renderMaintenancesTable(); updateDashboard(); showToast('success', 'Supprimé', 'Maintenance supprimée'); };
+        window.deleteIncident = function(id) { incidents = incidents.filter(i => i.id !== id); saveIncidents(); renderIncidentsTable(); updateDashboard(); showToast('success', 'Supprimé', 'Incident supprimé'); };
+        window.deleteMaintenance = function(id) { maintenances = maintenances.filter(m => m.id !== id); saveMaintenances(); renderMaintenancesTable(); updateDashboard(); showToast('success', 'Supprimé', 'Maintenance supprimée'); };
         
         function updateTicketNumbers() {
             document.getElementById('incidentTicketNumber').textContent = nextIncidentTicket.toString().padStart(4,'0');
-            document.getElementById('maintenanceTicketNumber').textContent = nextMaintenanceTicket.toString().padStart(4,'0');
         }
         
-        // ==================== GRAPHIQUES ====================
+        // EXPORT EXCEL FUNCTIONS
+        function exportToExcel(data, filename, sheetName) {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+        }
+        
+        function exportIncidentsReport() {
+            const incidentsData = incidents.map(i => ({
+                'ID': i.id,
+                'Ticket': i.ticketNumber,
+                'Nom': i.name,
+                'Département': departmentLabels[i.department] || i.department,
+                'Description': i.description,
+                'Priorité': i.priority,
+                'Statut': i.status,
+                'Date création': new Date(i.createdAt).toLocaleDateString('fr-FR')
+            }));
+            exportToExcel(incidentsData, 'rapport_incidents', 'Incidents');
+            showToast('success', 'Export réussi', 'Le rapport des incidents a été exporté');
+        }
+        
+        function exportSupportReport() {
+            const supportData = supportTickets.map(t => ({
+                'ID': t.id,
+                'Ticket': t.ticketNumber,
+                'Demandeur': t.name,
+                'Département': t.departmentLabel,
+                'Type': t.typeLabel,
+                'Description': t.description,
+                'Priorité': t.priorityLabel,
+                'Statut': t.statusLabel,
+                'Date création': new Date(t.createdAt).toLocaleDateString('fr-FR')
+            }));
+            exportToExcel(supportData, 'rapport_support', 'Support');
+            showToast('success', 'Export réussi', 'Le rapport des demandes support a été exporté');
+        }
+        
+        function exportPrintersReport() {
+            const printersData = printers.map(p => ({
+                'ID': p.id,
+                'Nom': p.name,
+                'Modèle': p.model,
+                'Département': p.departmentLabel,
+                'Dernière recharge': new Date(p.lastRefill).toLocaleDateString('fr-FR'),
+                'Jours écoulés': calculateDaysSince(p.lastRefill),
+                'Statut': getStatusText(calculateDaysSince(p.lastRefill))
+            }));
+            exportToExcel(printersData, 'rapport_imprimantes', 'Imprimantes');
+            showToast('success', 'Export réussi', 'Le rapport des imprimantes a été exporté');
+        }
+        
+        function exportFullReport() {
+            const incidentsData = incidents.map(i => ({
+                'Type': 'Incident',
+                'ID': i.id,
+                'Ticket': i.ticketNumber,
+                'Nom': i.name,
+                'Département': departmentLabels[i.department] || i.department,
+                'Description': i.description,
+                'Priorité': i.priority,
+                'Statut': i.status,
+                'Date': new Date(i.createdAt).toLocaleDateString('fr-FR')
+            }));
+            
+            const supportData = supportTickets.map(t => ({
+                'Type': 'Support',
+                'ID': t.id,
+                'Ticket': t.ticketNumber,
+                'Nom': t.name,
+                'Département': t.departmentLabel,
+                'Description': t.description,
+                'Priorité': t.priorityLabel,
+                'Statut': t.statusLabel,
+                'Date': new Date(t.createdAt).toLocaleDateString('fr-FR')
+            }));
+            
+            const printersData = printers.map(p => ({
+                'Type': 'Imprimante',
+                'ID': p.id,
+                'Nom': p.name,
+                'Modèle': p.model,
+                'Département': p.departmentLabel,
+                'Dernière recharge': new Date(p.lastRefill).toLocaleDateString('fr-FR'),
+                'Jours écoulés': calculateDaysSince(p.lastRefill),
+                'Statut': getStatusText(calculateDaysSince(p.lastRefill)),
+                'Date': '-'
+            }));
+            
+            const allData = [...incidentsData, ...supportData, ...printersData];
+            exportToExcel(allData, 'rapport_complet_it', 'Rapport Complet');
+            showToast('success', 'Export réussi', 'Le rapport complet a été exporté');
+        }
+        
+        // Graphiques
         function initCharts() {
             const ctx1 = document.getElementById('reportsPriorityChart')?.getContext('2d');
             if(ctx1) new Chart(ctx1, { type: 'pie', data: { labels: ['Critique', 'Majeur', 'Mineur'], datasets: [{ data: [incidents.filter(i=>i.priority==='critical').length, incidents.filter(i=>i.priority==='major').length, incidents.filter(i=>i.priority==='minor').length], backgroundColor: ['#e74c3c','#f39c12','#2ecc71'] }] } });
@@ -1143,7 +1253,7 @@
             if(ctx3) {
                 const types = { hardware: 0, software: 0, network: 0, access: 0, other: 0 };
                 supportTickets.forEach(t => types[t.type]++);
-                new Chart(ctx3, { type: 'bar', data: { labels: ['Matériel', 'Logiciel', 'Réseau', 'Accès', 'Autre'], datasets: [{ label: 'Nombre de demandes', data: [types.hardware, types.software, types.network, types.access, types.other], backgroundColor: '#3498db' }] } });
+                new Chart(ctx3, { type: 'bar', data: { labels: ['Matériel', 'Logiciel', 'Réseau', 'Accès', 'Autre'], datasets: [{ label: "Nombre de demandes", data: [types.hardware, types.software, types.network, types.access, types.other], backgroundColor: '#3498db' }] } });
             }
             
             const ctx4 = document.getElementById('supportTrendChart')?.getContext('2d');
@@ -1157,7 +1267,6 @@
             updateRefillsChart();
         }
         
-        function exportAllToExcel() { showToast('info', 'Export', 'Fonctionnalité disponible'); }
         function showToast(type, title, message) {
             const toast = document.getElementById('toast');
             toast.className = `toast show ${type}`;
@@ -1180,12 +1289,16 @@
             } else showToast('error', 'Erreur', 'Identifiants incorrects');
         }
         
-        // ==================== EVENT LISTENERS ====================
+        // Event Listeners
         document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); });
         document.getElementById('incidentForm')?.addEventListener('submit', createIncident);
         document.getElementById('maintenanceForm')?.addEventListener('submit', createMaintenance);
         document.getElementById('supportForm')?.addEventListener('submit', createSupportTicket);
-        document.getElementById('exportExcelBtn')?.addEventListener('click', exportAllToExcel);
+        document.getElementById('exportExcelBtn')?.addEventListener('click', exportFullReport);
+        document.getElementById('exportIncidentsReport')?.addEventListener('click', exportIncidentsReport);
+        document.getElementById('exportSupportReport')?.addEventListener('click', exportSupportReport);
+        document.getElementById('exportPrintersReport')?.addEventListener('click', exportPrintersReport);
+        document.getElementById('exportFullReport')?.addEventListener('click', exportFullReport);
         document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser=null; document.getElementById('mainApp').style.display='none'; document.getElementById('loginModal').style.display='flex'; });
         document.getElementById('addPrinterBtn')?.addEventListener('click', () => document.getElementById('printerModal').classList.add('show'));
         document.getElementById('savePrinterBtn')?.addEventListener('click', () => {
