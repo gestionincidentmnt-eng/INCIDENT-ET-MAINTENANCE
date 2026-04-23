@@ -361,7 +361,7 @@
             background: white;
             border-radius: 5px;
             width: 90%;
-            max-width: 500px;
+            max-width: 550px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -466,10 +466,30 @@
             flex-wrap: wrap;
         }
         
+        .datetime-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .duration-info {
+            background: var(--light);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .duration-info span {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
         @media (max-width: 768px) {
             .nav-tabs { flex-direction: column; }
             .charts-grid { grid-template-columns: 1fr; }
             .printer-card { flex-direction: column; text-align: center; }
+            .datetime-group { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -545,7 +565,7 @@
             
             <div class="card">
                 <h2>📋 Incidents récents</h2>
-                <table id="recentIncidents"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Priorité</th><th>Statut</th><th>Date</th></tr></thead><tbody></tbody></table>
+                <table id="recentIncidents"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Priorité</th><th>Statut</th><th>Date début</th></tr></thead><tbody></tbody></table>
             </div>
             
             <div class="card">
@@ -581,6 +601,10 @@
                             <option value="minor">Mineur</option><option value="major">Majeur</option><option value="critical">Critique</option>
                         </select>
                     </div>
+                    <div class="datetime-group">
+                        <div class="form-group"><label>📅 Date et heure de début</label><input type="datetime-local" id="incidentStartDate" required></div>
+                        <div class="form-group"><label>📅 Date et heure de fin (optionnel)</label><input type="datetime-local" id="incidentEndDate"></div>
+                    </div>
                     <button type="submit" class="btn-success">Créer l'incident</button>
                 </form>
             </div>
@@ -590,7 +614,7 @@
                     <div class="filter-group"><select id="filterStatus"><option value="">Tous statuts</option><option value="open">Ouvert</option><option value="in-progress">En cours</option><option value="resolved">Résolu</option><option value="closed">Fermé</option></select></div>
                     <div class="filter-group"><select id="filterDepartment"><option value="">Tous départements</option><option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option><option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option><option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option><option value="daf">DAF</option><option value="cp">CP</option></select></div>
                 </div>
-                <table id="incidentsTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Département</th><th>Priorité</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                <table id="incidentsTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Département</th><th>Priorité</th><th>Statut</th><th>Début</th><th>Fin</th><th>Durée</th><th>Actions</th></tr></thead><tbody></tbody></table>
             </div>
         </div>
         
@@ -610,12 +634,15 @@
                     </div>
                     <div class="form-group"><label>Description</label><textarea id="maintenanceDescription" rows="3"></textarea></div>
                     <div class="form-group"><label>Type</label><select id="maintenanceType"><option value="preventive">Préventive</option><option value="corrective">Corrective</option><option value="urgent">Urgente</option></select></div>
-                    <div class="form-group"><label>Date planifiée</label><input type="datetime-local" id="maintenanceScheduledDate" required></div>
+                    <div class="datetime-group">
+                        <div class="form-group"><label>📅 Date et heure de début</label><input type="datetime-local" id="maintenanceStartDate" required></div>
+                        <div class="form-group"><label>📅 Date et heure de fin prévue</label><input type="datetime-local" id="maintenanceEndDate"></div>
+                    </div>
                     <button type="submit" class="btn-success">Planifier</button>
                 </form>
             </div>
             <div class="card"><h2>📅 Maintenances</h2>
-                <table id="maintenanceTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Type</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                <table id="maintenanceTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Type</th><th>Début</th><th>Fin</th><th>Durée</th><th>Statut</th><th>Actions</th></tr></thead><tbody></tbody></table>
             </div>
         </div>
         
@@ -669,6 +696,10 @@
                             <option value="critical">Critique</option>
                         </select>
                     </div>
+                    <div class="datetime-group">
+                        <div class="form-group"><label>📅 Date et heure de début</label><input type="datetime-local" id="supportStartDate" required></div>
+                        <div class="form-group"><label>📅 Date et heure de fin (optionnel)</label><input type="datetime-local" id="supportEndDate"></div>
+                    </div>
                     <button type="submit" class="btn-success">Créer la demande</button>
                 </form>
             </div>
@@ -682,7 +713,7 @@
                     <div class="filter-group"><select id="filterSupportDepartment"><option value="">Tous départements</option><option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option><option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option><option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option><option value="daf">DAF</option><option value="cp">CP</option></select></div>
                 </div>
                 <table id="supportTable">
-                    <thead><tr><th>ID</th><th>Ticket</th><th>Demandeur</th><th>Département</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Ticket</th><th>Demandeur</th><th>Département</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Début</th><th>Fin</th><th>Durée</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -759,6 +790,32 @@
             dga: "DGA", dg: "DG", dcom: "DCOM", dplmg: "DPLMG", daf: "DAF", cp: "CP"
         };
         
+        // Fonction pour calculer la durée entre deux dates
+        function calculateDuration(startDate, endDate) {
+            if (!startDate || !endDate) return '-';
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (isNaN(start) || isNaN(end)) return '-';
+            const diffMs = end - start;
+            if (diffMs <= 0) return '-';
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            if (diffHours > 0) {
+                return `${diffHours}h ${diffMinutes}min`;
+            }
+            return `${diffMinutes}min`;
+        }
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            if (isNaN(date)) return '-';
+            return date.toLocaleString('fr-FR', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+        
         // Données principales
         let incidents = JSON.parse(localStorage.getItem('incidents')) || [];
         let maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
@@ -790,11 +847,23 @@
             savePrinters();
         }
         
+        if (incidents.length === 0) {
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            incidents = [
+                { id: 1, ticketNumber: "INC-0001", name: "Jean Dupont", department: "dsi", description: "Panne réseau", priority: "critical", status: "open", createdAt: now.toISOString(), startDate: yesterday.toISOString(), endDate: null },
+                { id: 2, ticketNumber: "INC-0002", name: "Marie Martin", department: "daf", description: "Problème logiciel", priority: "major", status: "in-progress", createdAt: now.toISOString(), startDate: now.toISOString(), endDate: null }
+            ];
+            saveIncidents();
+        }
+        
         if (supportTickets.length === 0) {
+            const now = new Date();
             supportTickets = [
-                { id: 1, ticketNumber: "SUP-0001", name: "Jean Dupont", department: "dsi", departmentLabel: "DSI", type: "hardware", typeLabel: "Problème matériel", description: "Imprimante ne répond plus", priority: "high", priorityLabel: "Haute", status: "in-progress", statusLabel: "En cours", createdAt: new Date().toISOString() },
-                { id: 2, ticketNumber: "SUP-0002", name: "Marie Curie", department: "daf", departmentLabel: "DAF", type: "software", typeLabel: "Problème logiciel", description: "Bug dans l'application financière", priority: "medium", priorityLabel: "Moyenne", status: "open", statusLabel: "Ouvert", createdAt: new Date().toISOString() },
-                { id: 3, ticketNumber: "SUP-0003", name: "Paul Martin", department: "cp", departmentLabel: "CP", type: "access", typeLabel: "Accès / Compte", description: "Problème d'accès au réseau", priority: "high", priorityLabel: "Haute", status: "open", statusLabel: "Ouvert", createdAt: new Date().toISOString() }
+                { id: 1, ticketNumber: "SUP-0001", name: "Jean Dupont", department: "dsi", departmentLabel: "DSI", type: "hardware", typeLabel: "Problème matériel", description: "Imprimante ne répond plus", priority: "high", priorityLabel: "Haute", status: "in-progress", statusLabel: "En cours", createdAt: now.toISOString(), startDate: now.toISOString(), endDate: null },
+                { id: 2, ticketNumber: "SUP-0002", name: "Marie Curie", department: "daf", departmentLabel: "DAF", type: "software", typeLabel: "Problème logiciel", description: "Bug dans l'application financière", priority: "medium", priorityLabel: "Moyenne", status: "open", statusLabel: "Ouvert", createdAt: now.toISOString(), startDate: now.toISOString(), endDate: null },
+                { id: 3, ticketNumber: "SUP-0003", name: "Paul Martin", department: "cp", departmentLabel: "CP", type: "access", typeLabel: "Accès / Compte", description: "Problème d'accès au réseau", priority: "high", priorityLabel: "Haute", status: "open", statusLabel: "Ouvert", createdAt: now.toISOString(), startDate: now.toISOString(), endDate: null }
             ];
             saveSupportTickets();
         }
@@ -979,16 +1048,20 @@
             tbody.innerHTML = filtered.map(t => {
                 let priorityClass = t.priority === 'critical' ? 'badge-critical' : (t.priority === 'high' ? 'badge-high' : (t.priority === 'medium' ? 'badge-medium' : 'badge-low'));
                 let statusClass = t.status === 'open' ? 'badge-open' : (t.status === 'in-progress' ? 'badge-progress' : (t.status === 'resolved' ? 'badge-resolved' : 'badge-closed'));
+                const duration = calculateDuration(t.startDate, t.endDate);
                 return `<tr>
                     <td>${t.id}</td><td>${t.ticketNumber}</td><td>${t.name}</td><td>${t.departmentLabel}</td>
                     <td>${t.typeLabel}</td><td><span class="badge ${priorityClass}">${t.priorityLabel}</span></td>
                     <td><span class="badge ${statusClass}">${t.statusLabel}</span></td>
-                    <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+                    <td>${formatDateTime(t.startDate)}</td>
+                    <td>${formatDateTime(t.endDate)}</td>
+                    <td>${duration}</td>
                     <td class="actions">
                         ${t.status !== 'resolved' && t.status !== 'closed' ? `<button onclick="updateSupportStatus(${t.id}, 'in-progress')" class="btn-warning btn-sm">En cours</button>
                         <button onclick="updateSupportStatus(${t.id}, 'resolved')" class="btn-success btn-sm">Résoudre</button>` : ''}
+                        <button onclick="editSupportTicketDates(${t.id})" class="btn-info btn-sm">📅 Modifier dates</button>
                         <button onclick="deleteSupportTicket(${t.id})" class="btn-danger btn-sm">🗑️</button>
-                     </td>
+                    </td>
                 </tr>`;
             }).join('');
             
@@ -1010,6 +1083,8 @@
             const priority = document.getElementById('supportPriority').value;
             const priorityLabels = { low: "Basse", medium: "Moyenne", high: "Haute", critical: "Critique" };
             const department = document.getElementById('supportDepartment').value;
+            const startDate = document.getElementById('supportStartDate').value;
+            const endDate = document.getElementById('supportEndDate').value || null;
             
             const ticket = {
                 id: nextSupportId++, ticketNumber: `SUP-${(nextSupportTicket++).toString().padStart(4, '0')}`,
@@ -1020,7 +1095,9 @@
                 description: document.getElementById('supportDescription').value,
                 priority: priority, priorityLabel: priorityLabels[priority],
                 status: 'open', statusLabel: 'Ouvert',
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                startDate: startDate,
+                endDate: endDate
             };
             supportTickets.push(ticket);
             saveSupportTickets();
@@ -1030,12 +1107,29 @@
             showToast('success', 'Demande créée', `Ticket ${ticket.ticketNumber} créé`);
         }
         
+        window.editSupportTicketDates = function(id) {
+            const ticket = supportTickets.find(t => t.id === id);
+            if (!ticket) return;
+            const newStartDate = prompt("Nouvelle date de début (format YYYY-MM-DD HH:MM):", ticket.startDate ? ticket.startDate.replace('T', ' ') : '');
+            const newEndDate = prompt("Nouvelle date de fin (format YYYY-MM-DD HH:MM) - laissez vide si non terminé:", ticket.endDate ? ticket.endDate.replace('T', ' ') : '');
+            if (newStartDate) {
+                ticket.startDate = newStartDate.replace(' ', 'T');
+                ticket.endDate = newEndDate ? newEndDate.replace(' ', 'T') : null;
+                saveSupportTickets();
+                renderSupportTickets();
+                showToast('success', 'Dates modifiées', `Ticket ${ticket.ticketNumber} mis à jour`);
+            }
+        };
+        
         window.updateSupportStatus = function(id, status) {
             const ticket = supportTickets.find(t => t.id === id);
             if (ticket) {
                 const statusLabels = { open: "Ouvert", 'in-progress': "En cours", resolved: "Résolu", closed: "Fermé" };
                 ticket.status = status;
                 ticket.statusLabel = statusLabels[status];
+                if (status === 'resolved' && !ticket.endDate) {
+                    ticket.endDate = new Date().toISOString();
+                }
                 saveSupportTickets();
                 renderSupportTickets();
                 showToast('info', 'Statut mis à jour', `Ticket ${ticket.ticketNumber} - ${statusLabels[status]}`);
@@ -1065,24 +1159,60 @@
             if (statusFilter) filtered = filtered.filter(i => i.status === statusFilter);
             if (departmentFilter) filtered = filtered.filter(i => i.department === departmentFilter);
             
-            tbody.innerHTML = filtered.map(i => `<tr>
-                <td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td><td>${departmentLabels[i.department] || i.department}</td>
-                <td><span class="badge ${i.priority === 'critical' ? 'badge-critical' : (i.priority === 'major' ? 'badge-high' : 'badge-low')}">${i.priority}</span></td>
-                <td><span class="badge">${i.status}</span></td>
-                <td>${new Date(i.createdAt).toLocaleDateString()}</td>
-                <td class="actions"><button onclick="deleteIncident(${i.id})" class="btn-danger btn-sm">🗑️</button></td>
-            </tr>`).join('');
+            tbody.innerHTML = filtered.map(i => {
+                const duration = calculateDuration(i.startDate, i.endDate);
+                return `<tr>
+                    <td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td><td>${departmentLabels[i.department] || i.department}</td>
+                    <td><span class="badge ${i.priority === 'critical' ? 'badge-critical' : (i.priority === 'major' ? 'badge-high' : 'badge-low')}">${i.priority}</span></td>
+                    <td><span class="badge">${i.status}</span></td>
+                    <td>${formatDateTime(i.startDate)}</td><td>${formatDateTime(i.endDate)}</td>
+                    <td>${duration}</td>
+                    <td class="actions"><button onclick="editIncidentDates(${i.id})" class="btn-info btn-sm">📅 Modifier dates</button><button onclick="deleteIncident(${i.id})" class="btn-danger btn-sm">🗑️</button></td>
+                </tr>`;
+            }).join('');
         }
+        
+        window.editIncidentDates = function(id) {
+            const incident = incidents.find(i => i.id === id);
+            if (!incident) return;
+            const newStartDate = prompt("Nouvelle date de début (format YYYY-MM-DD HH:MM):", incident.startDate ? incident.startDate.replace('T', ' ') : '');
+            const newEndDate = prompt("Nouvelle date de fin (format YYYY-MM-DD HH:MM) - laissez vide si non terminé:", incident.endDate ? incident.endDate.replace('T', ' ') : '');
+            if (newStartDate) {
+                incident.startDate = newStartDate.replace(' ', 'T');
+                incident.endDate = newEndDate ? newEndDate.replace(' ', 'T') : null;
+                saveIncidents();
+                renderIncidentsTable();
+                showToast('success', 'Dates modifiées', `Incident ${incident.ticketNumber} mis à jour`);
+            }
+        };
         
         function renderMaintenancesTable() {
             const tbody = document.querySelector('#maintenanceTable tbody');
             if (!tbody) return;
-            tbody.innerHTML = maintenances.map(m => `<tr>
-                <td>${m.id}</td><td>${m.ticketNumber}</td><td>${m.name}</td><td>${m.type}</td>
-                <td>${new Date(m.scheduledDate).toLocaleDateString()}</td><td>${m.status}</td>
-                <td class="actions"><button onclick="deleteMaintenance(${m.id})" class="btn-danger btn-sm">🗑️</button></td>
-            </tr>`).join('');
+            tbody.innerHTML = maintenances.map(m => {
+                const duration = calculateDuration(m.startDate, m.endDate);
+                return `<tr>
+                    <td>${m.id}</td><td>${m.ticketNumber}</td><td>${m.name}</td><td>${m.type}</td>
+                    <td>${formatDateTime(m.startDate)}</td><td>${formatDateTime(m.endDate)}</td>
+                    <td>${duration}</td><td>${m.status}</td>
+                    <td class="actions"><button onclick="editMaintenanceDates(${m.id})" class="btn-info btn-sm">📅 Modifier dates</button><button onclick="deleteMaintenance(${m.id})" class="btn-danger btn-sm">🗑️</button></td>
+                </tr>`;
+            }).join('');
         }
+        
+        window.editMaintenanceDates = function(id) {
+            const maintenance = maintenances.find(m => m.id === id);
+            if (!maintenance) return;
+            const newStartDate = prompt("Nouvelle date de début (format YYYY-MM-DD HH:MM):", maintenance.startDate ? maintenance.startDate.replace('T', ' ') : '');
+            const newEndDate = prompt("Nouvelle date de fin (format YYYY-MM-DD HH:MM) - laissez vide si non terminé:", maintenance.endDate ? maintenance.endDate.replace('T', ' ') : '');
+            if (newStartDate) {
+                maintenance.startDate = newStartDate.replace(' ', 'T');
+                maintenance.endDate = newEndDate ? newEndDate.replace(' ', 'T') : null;
+                saveMaintenances();
+                renderMaintenancesTable();
+                showToast('success', 'Dates modifiées', `Maintenance ${maintenance.ticketNumber} mise à jour`);
+            }
+        };
         
         function updateDashboard() {
             document.getElementById('openIncidents').textContent = incidents.filter(i => i.status === 'open' || i.status === 'in-progress').length;
@@ -1096,13 +1226,15 @@
                 recentTbody.innerHTML = incidents.slice(-5).reverse().map(i => `<tr>
                     <td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td>
                     <td><span class="badge ${i.priority === 'critical' ? 'badge-critical' : 'badge-high'}">${i.priority}</span></td>
-                    <td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString()}</td>
+                    <td>${i.status}</td><td>${formatDateTime(i.startDate)}</td>
                 </tr>`).join('');
             }
         }
         
         function createIncident(e) {
             e.preventDefault();
+            const startDate = document.getElementById('incidentStartDate').value;
+            const endDate = document.getElementById('incidentEndDate').value || null;
             incidents.push({ 
                 id: nextIncidentId++, 
                 ticketNumber: `INC-${(nextIncidentTicket++).toString().padStart(4,'0')}`, 
@@ -1111,7 +1243,9 @@
                 description: document.getElementById('incidentDescription').value, 
                 priority: document.getElementById('incidentPriority').value, 
                 status: 'open', 
-                createdAt: new Date().toISOString() 
+                createdAt: new Date().toISOString(),
+                startDate: startDate,
+                endDate: endDate
             });
             saveIncidents();
             localStorage.setItem('nextIncidentId', nextIncidentId);
@@ -1123,6 +1257,8 @@
         
         function createMaintenance(e) {
             e.preventDefault();
+            const startDate = document.getElementById('maintenanceStartDate').value;
+            const endDate = document.getElementById('maintenanceEndDate').value || null;
             maintenances.push({ 
                 id: nextMaintenanceId++, 
                 ticketNumber: `MNT-${(nextMaintenanceTicket++).toString().padStart(4,'0')}`, 
@@ -1130,7 +1266,8 @@
                 department: document.getElementById('maintenanceDepartment').value, 
                 description: document.getElementById('maintenanceDescription').value, 
                 type: document.getElementById('maintenanceType').value, 
-                scheduledDate: document.getElementById('maintenanceScheduledDate').value, 
+                startDate: startDate,
+                endDate: endDate,
                 status: 'planned', 
                 createdAt: new Date().toISOString() 
             });
@@ -1166,6 +1303,9 @@
                 'Description': i.description,
                 'Priorité': i.priority,
                 'Statut': i.status,
+                'Date début': i.startDate ? new Date(i.startDate).toLocaleString('fr-FR') : '-',
+                'Date fin': i.endDate ? new Date(i.endDate).toLocaleString('fr-FR') : '-',
+                'Durée': calculateDuration(i.startDate, i.endDate),
                 'Date création': new Date(i.createdAt).toLocaleDateString('fr-FR')
             }));
             exportToExcel(incidentsData, 'rapport_incidents', 'Incidents');
@@ -1182,6 +1322,9 @@
                 'Description': t.description,
                 'Priorité': t.priorityLabel,
                 'Statut': t.statusLabel,
+                'Date début': t.startDate ? new Date(t.startDate).toLocaleString('fr-FR') : '-',
+                'Date fin': t.endDate ? new Date(t.endDate).toLocaleString('fr-FR') : '-',
+                'Durée': calculateDuration(t.startDate, t.endDate),
                 'Date création': new Date(t.createdAt).toLocaleDateString('fr-FR')
             }));
             exportToExcel(supportData, 'rapport_support', 'Support');
@@ -1212,6 +1355,9 @@
                 'Description': i.description,
                 'Priorité': i.priority,
                 'Statut': i.status,
+                'Date début': i.startDate ? new Date(i.startDate).toLocaleString('fr-FR') : '-',
+                'Date fin': i.endDate ? new Date(i.endDate).toLocaleString('fr-FR') : '-',
+                'Durée': calculateDuration(i.startDate, i.endDate),
                 'Date': new Date(i.createdAt).toLocaleDateString('fr-FR')
             }));
             
@@ -1224,6 +1370,9 @@
                 'Description': t.description,
                 'Priorité': t.priorityLabel,
                 'Statut': t.statusLabel,
+                'Date début': t.startDate ? new Date(t.startDate).toLocaleString('fr-FR') : '-',
+                'Date fin': t.endDate ? new Date(t.endDate).toLocaleString('fr-FR') : '-',
+                'Durée': calculateDuration(t.startDate, t.endDate),
                 'Date': new Date(t.createdAt).toLocaleDateString('fr-FR')
             }));
             
@@ -1235,8 +1384,7 @@
                 'Département': p.departmentLabel,
                 'Dernière recharge': new Date(p.lastRefill).toLocaleDateString('fr-FR'),
                 'Jours écoulés': calculateDaysSince(p.lastRefill),
-                'Statut': getStatusText(calculateDaysSince(p.lastRefill)),
-                'Date': '-'
+                'Statut': getStatusText(calculateDaysSince(p.lastRefill))
             }));
             
             const allData = [...incidentsData, ...supportData, ...printersData];
