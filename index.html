@@ -1070,7 +1070,10 @@
             if(priorityFilter) filtered = filtered.filter(i=>i.priority===priorityFilter);
             
             tbody.innerHTML = filtered.map(i => `<tr>
-                <td>${i.id}</td><td><strong>${i.ticketNumber}</strong></strong></td>理学<td>${i.name}</td><td>${departmentLabels[i.department]}</td>
+                <td>${i.id}</td>
+                <td><strong>${i.ticketNumber}</strong></td>
+                <td>${i.name}</td>
+                <td>${departmentLabels[i.department]}</td>
                 <td><span class="badge ${i.priority==='critical'?'badge-critical':(i.priority==='major'?'badge-high':'badge-low')}">${i.priority}</span></td>
                 <td><span class="badge ${i.status==='open'?'badge-open':(i.status==='in-progress'?'badge-progress':(i.status==='resolved'?'badge-resolved':'badge-closed'))}">${i.status}</span></td>
                 <td class="date-cell">${formatDateShort(i.startDate)}</td>
