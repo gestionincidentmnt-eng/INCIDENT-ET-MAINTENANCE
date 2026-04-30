@@ -624,6 +624,1356 @@
             </div>
         </div>
         
+        <!-- INCIDENTS -->
+        <div id="incidents" class="tab-content">
+            <div class="card">
+                <h2>🆕 Créer un nouvel incident</h2>
+                <div class="ticket-info">
+                    <div class="ticket-number">📝 Ticket: INC-<span id="incidentTicketNumber">0001</span></div>
+                </div>
+                <form id="incidentForm">
+                    <div class="form-group">
+                        <label>👤 Nom et Prénom complets *</label>
+                        <input type="text" id="incidentName" placeholder="Ex: Jean Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🏢 Département *</label>
+                        <select id="incidentDepartment" required>
+                            <option value="">Sélectionnez un département</option>
+                            <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                            <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                            <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                            <option value="daf">DAF</option><option value="cp">CP</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>📝 Description détaillée *</label>
+                        <textarea id="incidentDescription" rows="3" placeholder="Décrivez précisément le problème..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>⚠️ Priorité *</label>
+                        <select id="incidentPriority" required>
+                            <option value="minor">🟢 Mineur</option>
+                            <option value="major">🟠 Majeur</option>
+                            <option value="critical">🔴 Critique</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Date et heure de début *</label>
+                        <input type="datetime-local" id="incidentStartDate" required>
+                    </div>
+                    <button type="submit" class="btn-success">✅ Créer l'incident</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Statistiques des incidents</h2>
+                <div class="incident-stats">
+                    <div class="incident-stat-card">
+                        <h4>Total incidents</h4>
+                        <div class="number" id="totalIncidents">0</div>
+                    </div>
+                    <div class="incident-stat-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <h4>Ouverts / En cours</h4>
+                        <div class="number" id="openIncidentsStat">0</div>
+                    </div>
+                    <div class="incident-stat-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                        <h4>Résolus / Fermés</h4>
+                        <div class="number" id="resolvedIncidentsStat">0</div>
+                    </div>
+                    <div class="incident-stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                        <h4>Critiques</h4>
+                        <div class="number" id="criticalIncidentsStat">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📋 Liste complète des incidents</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Filtrer par statut</label>
+                        <select id="filterStatus">
+                            <option value="">📌 Tous les statuts</option>
+                            <option value="open">🟡 Ouvert</option>
+                            <option value="in-progress">🟠 En cours</option>
+                            <option value="resolved">🟢 Résolu</option>
+                            <option value="closed">⚫ Fermé</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Filtrer par département</label>
+                        <select id="filterDepartment">
+                            <option value="">🏢 Tous départements</option>
+                            <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                            <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                            <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                            <option value="daf">DAF</option><option value="cp">CP</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Filtrer par priorité</label>
+                        <select id="filterPriority">
+                            <option value="">🎯 Toutes priorités</option>
+                            <option value="critical">🔴 Critique</option>
+                            <option value="major">🟠 Majeur</option>
+                            <option value="minor">🟢 Mineur</option>
+                        </select>
+                    </div>
+                </div>
+                <table id="incidentsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Ticket</th><th>Nom</th><th>Département</th>
+                            <th>Priorité</th><th>Statut</th><th>Date début</th>
+                            <th>Date fin</th><th>Durée</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- MAINTENANCE -->
+        <div id="maintenance" class="tab-content">
+            <div class="card">
+                <h2>🆕 Nouvelle Maintenance</h2>
+                <form id="maintenanceForm">
+                    <div class="form-group"><label>Nom</label><input type="text" id="maintenanceName" required></div>
+                    <div class="form-group"><label>Département</label>
+                        <select id="maintenanceDepartment">
+                            <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                            <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                            <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                            <option value="daf">DAF</option><option value="cp">CP</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Description</label><textarea id="maintenanceDescription" rows="3"></textarea></div>
+                    <div class="form-group"><label>Type</label><select id="maintenanceType"><option value="preventive">Préventive</option><option value="corrective">Corrective</option><option value="urgent">Urgente</option></select></div>
+                    <div class="form-group"><label>Date planifiée</label><input type="datetime-local" id="maintenanceScheduledDate" required></div>
+                    <button type="submit" class="btn-success">Planifier</button>
+                </form>
+            </div>
+            <div class="card"><h2>📅 Maintenances</h2>
+                <table id="maintenanceTable"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Type</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+        
+        <!-- GESTION D'ENCRE -->
+        <div id="ink" class="tab-content">
+            <div class="card">
+                <h2>🖨️ Gestion des recharges d'encre</h2>
+                <div class="info-box"><p>📌 Gérez ici les dates de recharge des imprimantes.</p></div>
+                <div style="margin-bottom: 20px;">
+                    <button id="addPrinterBtn" class="btn-success">➕ Ajouter une imprimante</button>
+                </div>
+                <div id="printersList"></div>
+            </div>
+        </div>
+        
+        <!-- SUPPORT TECHNIQUE -->
+        <div id="support" class="tab-content">
+            <div class="card">
+                <h2>🛠️ Nouvelle demande de support</h2>
+                <div class="ticket-info"><div class="ticket-number">Ticket: SUP-<span id="supportTicketNumber">0001</span></div></div>
+                <form id="supportForm">
+                    <div class="form-group"><label>Nom du demandeur</label><input type="text" id="supportName" required></div>
+                    <div class="form-group"><label>Département</label>
+                        <select id="supportDepartment" required>
+                            <option value="">Sélectionnez un département</option>
+                            <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                            <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                            <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                            <option value="daf">DAF</option><option value="cp">CP</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Type de demande</label>
+                        <select id="supportType" required>
+                            <option value="hardware">Problème matériel</option>
+                            <option value="software">Problème logiciel</option>
+                            <option value="network">Problème réseau</option>
+                            <option value="access">Accès / Compte</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Description détaillée</label><textarea id="supportDescription" rows="3" required></textarea></div>
+                    <div class="form-group"><label>Priorité</label>
+                        <select id="supportPriority" required>
+                            <option value="low">Basse</option>
+                            <option value="medium">Moyenne</option>
+                            <option value="high">Haute</option>
+                            <option value="critical">Critique</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-success">Créer la demande</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>📋 Liste des demandes de support</h2>
+                <div class="filters">
+                    <div class="filter-group"><select id="filterSupportStatus"><option value="">Tous statuts</option><option value="open">Ouvert</option><option value="in-progress">En cours</option><option value="resolved">Résolu</option></select></div>
+                    <div class="filter-group"><select id="filterSupportType"><option value="">Tous types</option><option value="hardware">Matériel</option><option value="software">Logiciel</option><option value="network">Réseau</option><option value="access">Accès</option></select></div>
+                    <div class="filter-group"><select id="filterSupportPriority"><option value="">Toutes priorités</option><option value="low">Basse</option><option value="medium">Moyenne</option><option value="high">Haute</option><option value="critical">Critique</option></select></div>
+                </div>
+                <table id="supportTable"><thead><tr><th>ID</th><th>Ticket</th><th>Demandeur</th><th>Département</th><th>Type</th><th>Priorité</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="card"><h2>📊 Statistiques support</h2><canvas id="supportStatsChart" style="height: 300px;"></canvas></div>
+        </div>
+        
+        <!-- RAPPORTS -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h2>📈 Rapports analytiques</h2>
+                <div class="export-buttons">
+                    <button id="exportIncidentsReport" class="btn-info">📄 Export Incidents</button>
+                    <button id="exportSupportReport" class="btn-info">📄 Export Support</button>
+                    <button id="exportPrintersReport" class="btn-info">📄 Export Imprimantes</button>
+                    <button id="exportFullReport" class="btn-success">📊 Export Complet (Multi-onglets)</button>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container"><canvas id="reportsPriorityChart"></canvas></div>
+                    <div class="chart-container"><canvas id="supportTypeChart"></canvas></div>
+                    <div class="chart-container"><canvas id="supportTrendChart"></canvas></div>
+                    <div class="chart-container"><canvas id="refillsChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PARAMÈTRES -->
+        <div id="settings" class="tab-content">
+            <div class="card"><h2>⚙️ Paramètres</h2>
+                <div class="form-group"><label>Période de rappel recharge (jours)</label><input type="number" id="refillReminderDays" min="1" max="90" value="30"></div>
+                <button id="saveSettings" class="btn-success">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Détails Incident -->
+    <div id="incidentDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>📋 Détails de l'incident</h3><button class="close-modal" onclick="closeIncidentModal()">&times;</button></div>
+            <div class="modal-body" id="incidentDetailBody"></div>
+            <div class="modal-footer"><button class="btn-danger" onclick="closeIncidentModal()">Fermer</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Modification Incident -->
+    <div id="editIncidentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>✏️ Modifier l'incident</h3><button class="close-modal" onclick="closeEditModal()">&times;</button></div>
+            <div class="modal-body">
+                <form id="editIncidentForm">
+                    <input type="hidden" id="editIncidentId">
+                    <div class="form-group"><label>Ticket</label><input type="text" id="editTicketNumber" readonly></div>
+                    <div class="form-group"><label>Nom</label><input type="text" id="editName" required></div>
+                    <div class="form-group"><label>Département</label>
+                        <select id="editDepartment" required>
+                            <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                            <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                            <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                            <option value="daf">DAF</option><option value="cp">CP</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Description</label><textarea id="editDescription" rows="3" required></textarea></div>
+                    <div class="form-group"><label>Priorité</label>
+                        <select id="editPriority" required>
+                            <option value="minor">Mineur</option><option value="major">Majeur</option><option value="critical">Critique</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Date début</label><input type="datetime-local" id="editStartDate" required></div>
+                    <div class="form-group"><label>Date fin</label><input type="datetime-local" id="editEndDate"></div>
+                    <div class="form-group"><label>Statut</label>
+                        <select id="editStatus">
+                            <option value="open">Ouvert</option><option value="in-progress">En cours</option>
+                            <option value="resolved">Résolu</option><option value="closed">Fermé</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <h4>🔧 Résolution</h4>
+                    <div class="form-group"><label>Description résolution</label><textarea id="editResolutionDesc" rows="3"></textarea></div>
+                    <div class="form-group"><label>Technicien</label><input type="text" id="editTechnician"></div>
+                    <div class="form-group"><label>Date résolution</label><input type="date" id="editResolutionDate"></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-success" onclick="saveIncidentEdit()">💾 Enregistrer</button><button class="btn-danger" onclick="closeEditModal()">Annuler</button></div>
+        </div>
+    </div>
+
+    <!-- Modale ajout imprimante -->
+    <div id="printerModal" class="modal"><div class="modal-content">
+        <div class="modal-header"><h3>Ajouter une imprimante</h3><button class="close-modal">&times;</button></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Nom</label><input type="text" id="printerName" required></div>
+            <div class="form-group"><label>Modèle</label><input type="text" id="printerModel" required></div>
+            <div class="form-group"><label>Date dernière recharge</label><input type="date" id="lastRefillDate" required></div>
+            <div class="form-group"><label>Département</label>
+                <select id="printerDepartment">
+                    <option value="dsi">DSI</option><option value="dsj">DSJ</option><option value="dsp">DSP</option>
+                    <option value="dpsp">DPSP</option><option value="drh">DRH</option><option value="dga">DGA</option>
+                    <option value="dg">DG</option><option value="dcom">DCOM</option><option value="dplmg">DPLMG</option>
+                    <option value="daf">DAF</option><option value="cp">CP</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer"><button id="savePrinterBtn" class="btn-success">Enregistrer</button><button class="close-modal btn-danger">Annuler</button></div>
+    </div></div>
+    
+    <!-- Modale recharge -->
+    <div id="refillModal" class="modal"><div class="modal-content">
+        <div class="modal-header"><h3>🔄 Date de recharge</h3><button class="close-modal">&times;</button></div>
+        <div class="modal-body">
+            <p><strong>Imprimante :</strong> <span id="refillPrinterName"></span></p>
+            <div class="form-group"><label>Nouvelle date</label><input type="date" id="newRefillDate" required></div>
+        </div>
+        <div class="modal-footer"><button id="confirmRefillBtn" class="btn-success">Enregistrer</button><button class="close-modal btn-danger">Annuler</button></div>
+    </div></div>
+
+    <div id="toast" class="toast"><div><div id="toastTitle"></div><div id="toastMessage"></div></div></div>
+
+    <script>
+        const departmentLabels = { dsi: "DSI", dsj: "DSJ", dsp: "DSP", dpsp: "DPSP", drh: "DRH", dga: "DGA", dg: "DG", dcom: "DCOM", dplmg: "DPLMG", daf: "DAF", cp: "CP" };
+        
+        let incidents = JSON.parse(localStorage.getItem('incidents')) || [];
+        let maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
+        let printers = JSON.parse(localStorage.getItem('printers')) || [];
+        let supportTickets = JSON.parse(localStorage.getItem('supportTickets')) || [];
+        let refillReminderDays = parseInt(localStorage.getItem('refillReminderDays')) || 30;
+        
+        let currentUser = null;
+        let nextIncidentId = parseInt(localStorage.getItem('nextIncidentId')) || 1;
+        let nextMaintenanceId = parseInt(localStorage.getItem('nextMaintenanceId')) || 1;
+        let nextIncidentTicket = parseInt(localStorage.getItem('nextIncidentTicket')) || 1;
+        let nextMaintenanceTicket = parseInt(localStorage.getItem('nextMaintenanceTicket')) || 1;
+        let nextSupportTicket = parseInt(localStorage.getItem('nextSupportTicket')) || 1;
+        let nextSupportId = parseInt(localStorage.getItem('nextSupportId')) || 1;
+        
+        // Données exemple
+        if (incidents.length === 0) {
+            const now = new Date();
+            const fiveDaysAgo = new Date(now); fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5); fiveDaysAgo.setHours(9, 0, 0);
+            const twoDaysAgo = new Date(now); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2); twoDaysAgo.setHours(17, 30, 0);
+            const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1); yesterday.setHours(10, 0, 0);
+            incidents = [
+                { id: 1, ticketNumber: "INC-0001", name: "Jean Dupont", department: "dsi", description: "Imprimante ne fonctionne plus", priority: "major", status: "resolved", startDate: fiveDaysAgo.toISOString(), endDate: twoDaysAgo.toISOString(), resolution: { description: "Remplacement cartouche", technician: "Thomas Martin", resolutionDate: twoDaysAgo.toISOString().split('T')[0] } },
+                { id: 2, ticketNumber: "INC-0002", name: "Marie Curie", department: "daf", description: "Problème réseau", priority: "critical", status: "open", startDate: yesterday.toISOString(), endDate: null, resolution: null }
+            ];
+            saveIncidents();
+        }
+        
+        if (printers.length === 0) {
+            const today = new Date().toISOString().split('T')[0];
+            const twoMonthsAgo = new Date(); twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+            printers = [
+                { id: 1, name: "Bureau DSI", model: "HP LaserJet", department: "dsi", departmentLabel: "DSI", lastRefill: twoMonthsAgo.toISOString().split('T')[0] },
+                { id: 2, name: "Salle DAF", model: "Canon", department: "daf", departmentLabel: "DAF", lastRefill: today }
+            ];
+            savePrinters();
+        }
+        
+        if (supportTickets.length === 0) {
+            supportTickets = [
+                { id: 1, ticketNumber: "SUP-0001", name: "Jean Dupont", department: "dsi", departmentLabel: "DSI", type: "hardware", typeLabel: "Matériel", description: "Problème imprimante", priority: "high", priorityLabel: "Haute", status: "open", statusLabel: "Ouvert", createdAt: new Date().toISOString() }
+            ];
+            saveSupportTickets();
+        }
+        
+        function saveIncidents() { localStorage.setItem('incidents', JSON.stringify(incidents)); updateDashboard(); updateIncidentStats(); }
+        function saveMaintenances() { localStorage.setItem('maintenances', JSON.stringify(maintenances)); }
+        function savePrinters() { localStorage.setItem('printers', JSON.stringify(printers)); renderPrinters(); updateDashboard(); }
+        function saveSupportTickets() { localStorage.setItem('supportTickets', JSON.stringify(supportTickets)); }
+        
+        function calculateDaysSince(dateString) {
+            if (!dateString) return 999;
+            const lastDate = new Date(dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+        }
+        
+        function calculateDuration(startDate, endDate) {
+            if (!startDate) return "N/A";
+            const start = new Date(startDate);
+            const end = endDate ? new Date(endDate) : new Date();
+            const diffMs = end - start;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            if (diffDays > 0) return `${diffDays}j ${diffHours}h`;
+            if (diffHours > 0) return `${diffHours}h`;
+            return "< 1h";
+        }
+        
+        function formatDateShort(dateString) {
+            if (!dateString) return "En cours";
+            return new Date(dateString).toLocaleDateString('fr-FR');
+        }
+        
+        function updateIncidentStats() {
+            document.getElementById('totalIncidents').textContent = incidents.length;
+            document.getElementById('openIncidentsStat').textContent = incidents.filter(i => i.status === 'open' || i.status === 'in-progress').length;
+            document.getElementById('resolvedIncidentsStat').textContent = incidents.filter(i => i.status === 'resolved' || i.status === 'closed').length;
+            document.getElementById('criticalIncidentsStat').textContent = incidents.filter(i => i.priority === 'critical').length;
+        }
+        
+        // IMPRIMANTES
+        function renderPrinters() {
+            const container = document.getElementById('printersList');
+            if (!container) return;
+            container.innerHTML = printers.map(p => {
+                const daysSince = calculateDaysSince(p.lastRefill);
+                const statusColor = daysSince >= refillReminderDays ? 'danger' : (daysSince >= refillReminderDays-10 ? 'warning' : 'success');
+                const statusText = daysSince >= refillReminderDays ? '⚠️ Urgent' : (daysSince >= refillReminderDays-10 ? '⚡ Bientôt' : '✅ OK');
+                return `<div class="printer-card">
+                    <div class="printer-info"><h3>🖨️ ${p.name}</h3><p>Modèle: ${p.model} | Département: ${p.departmentLabel}</p><p>Dernière recharge: ${new Date(p.lastRefill).toLocaleDateString('fr-FR')} (${daysSince} jours)</p></div>
+                    <div class="printer-recharge"><span style="color: var(--${statusColor});">${statusText}</span><br><button onclick="openRefillModal(${p.id})" class="btn-warning btn-sm">🔄 Recharge</button><button onclick="deletePrinter(${p.id})" class="btn-danger btn-sm">🗑️</button></div>
+                </div>`;
+            }).join('');
+            if(printers.length===0) container.innerHTML='<p>Aucune imprimante</p>';
+            document.getElementById('totalPrinters').textContent = printers.length;
+            updateUpcomingRefills();
+        }
+        
+        function updateUpcomingRefills() {
+            const container = document.getElementById('upcomingRefills');
+            if(!container) return;
+            const urgent = printers.filter(p => calculateDaysSince(p.lastRefill) >= refillReminderDays-5);
+            if(urgent.length===0) container.innerHTML='<p>✅ Tout est OK</p>';
+            else container.innerHTML = urgent.map(p => `<div style="padding:10px; background:#fff3cd;">⚠️ ${p.name} - ${new Date(p.lastRefill).toLocaleDateString()}</div>`).join('');
+        }
+        
+        window.openRefillModal = function(id) {
+            const printer = printers.find(p=>p.id===id);
+            if(printer){
+                document.getElementById('refillPrinterName').textContent = printer.name;
+                document.getElementById('newRefillDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('refillModal').classList.add('show');
+                document.getElementById('confirmRefillBtn').onclick = () => {
+                    const newDate = document.getElementById('newRefillDate').value;
+                    if(newDate){ printer.lastRefill = newDate; savePrinters(); document.getElementById('refillModal').classList.remove('show'); showToast('success','Recharge','Date mise à jour'); }
+                };
+            }
+        };
+        
+        window.deletePrinter = function(id) { if(confirm('Supprimer ?')){ printers=printers.filter(p=>p.id!==id); savePrinters(); showToast('success','Supprimé','Imprimante supprimée'); } };
+        
+        function addPrinter(name,model,dept,lastRefill){ printers.push({id:Date.now(),name,model,department:dept,departmentLabel:departmentLabels[dept],lastRefill}); savePrinters(); showToast('success','Ajoutée',name); }
+        
+        // INCIDENTS - FONCTIONS ACTIVES
+        function renderIncidentsTable() {
+            const tbody = document.querySelector('#incidentsTable tbody');
+            if(!tbody) return;
+            const statusFilter = document.getElementById('filterStatus')?.value || '';
+            const deptFilter = document.getElementById('filterDepartment')?.value || '';
+            const priorityFilter = document.getElementById('filterPriority')?.value || '';
+            let filtered = incidents;
+            if(statusFilter) filtered = filtered.filter(i=>i.status===statusFilter);
+            if(deptFilter) filtered = filtered.filter(i=>i.department===deptFilter);
+            if(priorityFilter) filtered = filtered.filter(i=>i.priority===priorityFilter);
+            
+            tbody.innerHTML = filtered.map(i => `<tr>
+                <td>${i.id}</td>
+                <td><strong>${i.ticketNumber}</strong></td>
+                <td>${i.name}</td>
+                <td>${departmentLabels[i.department]}</strong></td>
+                <td><span class="badge ${i.priority==='critical'?'badge-critical':(i.priority==='major'?'badge-high':'badge-low')}">${i.priority}</span></td>
+                <td><span class="badge ${i.status==='open'?'badge-open':(i.status==='in-progress'?'badge-progress':(i.status==='resolved'?'badge-resolved':'badge-closed'))}">${i.status}</span></td>
+                <td class="date-cell">${formatDateShort(i.startDate)}</td>
+                <td class="date-cell">${i.endDate?formatDateShort(i.endDate):'<span style="color:#f39c12;">● En cours</span>'}</td>
+                <td><span class="duration-badge">⏱️ ${calculateDuration(i.startDate,i.endDate)}</span></td>
+                <td class="actions"><button onclick="viewIncidentDetail(${i.id})" class="btn-info btn-sm">🔍</button><button onclick="editIncident(${i.id})" class="btn-warning btn-sm">✏️</button><button onclick="deleteIncident(${i.id})" class="btn-danger btn-sm">🗑️</button></td>
+            </tr>`).join('');
+            updateIncidentStats();
+        }
+        
+        function viewIncidentDetail(id){
+            const i = incidents.find(x=>x.id===id);
+            if(!i) return;
+            let html = `<div class="detail-row"><div class="detail-label">Ticket:</div><div class="detail-value">${i.ticketNumber}</div></div>
+                <div class="detail-row"><div class="detail-label">Nom:</div><div class="detail-value">${i.name}</div></div>
+                <div class="detail-row"><div class="detail-label">Département:</div><div class="detail-value">${departmentLabels[i.department]}</div></div>
+                <div class="detail-row"><div class="detail-label">Description:</div><div class="detail-value">${i.description}</div></div>
+                <div class="detail-row"><div class="detail-label">Priorité:</div><div class="detail-value">${i.priority}</div></div>
+                <div class="detail-row"><div class="detail-label">Statut:</div><div class="detail-value">${i.status}</div></div>
+                <div class="detail-row"><div class="detail-label">Date début:</div><div class="detail-value">${new Date(i.startDate).toLocaleString('fr-FR')}</div></div>
+                <div class="detail-row"><div class="detail-label">Date fin:</div><div class="detail-value">${i.endDate?new Date(i.endDate).toLocaleString('fr-FR'):'En cours'}</div></div>
+                <div class="detail-row"><div class="detail-label">Durée:</div><div class="detail-value"><strong>${calculateDuration(i.startDate,i.endDate)}</strong></div></div>`;
+            if(i.resolution) html+=`<div class="resolution-box"><h4>✅ Résolution</h4><div class="detail-row"><div class="detail-label">Description:</div><div class="detail-value">${i.resolution.description||''}</div></div><div class="detail-row"><div class="detail-label">Technicien:</div><div class="detail-value">${i.resolution.technician||''}</div></div><div class="detail-row"><div class="detail-label">Date:</div><div class="detail-value">${i.resolution.resolutionDate||''}</div></div></div>`;
+            else html+=`<div class="warning-box">⚠️ Non résolu</div>`;
+            document.getElementById('incidentDetailBody').innerHTML = html;
+            document.getElementById('incidentDetailModal').classList.add('show');
+        }
+        
+        function editIncident(id){
+            const i = incidents.find(x=>x.id===id);
+            if(!i) return;
+            document.getElementById('editIncidentId').value = i.id;
+            document.getElementById('editTicketNumber').value = i.ticketNumber;
+            document.getElementById('editName').value = i.name;
+            document.getElementById('editDepartment').value = i.department;
+            document.getElementById('editDescription').value = i.description;
+            document.getElementById('editPriority').value = i.priority;
+            document.getElementById('editStatus').value = i.status;
+            document.getElementById('editStartDate').value = i.startDate ? i.startDate.slice(0,16) : '';
+            document.getElementById('editEndDate').value = i.endDate ? i.endDate.slice(0,16) : '';
+            document.getElementById('editResolutionDesc').value = i.resolution?.description || '';
+            document.getElementById('editTechnician').value = i.resolution?.technician || '';
+            document.getElementById('editResolutionDate').value = i.resolution?.resolutionDate || '';
+            document.getElementById('editIncidentModal').classList.add('show');
+        }
+        
+        function saveIncidentEdit(){
+            const id = parseInt(document.getElementById('editIncidentId').value);
+            const i = incidents.find(x=>x.id===id);
+            if(i){
+                i.name = document.getElementById('editName').value;
+                i.department = document.getElementById('editDepartment').value;
+                i.description = document.getElementById('editDescription').value;
+                i.priority = document.getElementById('editPriority').value;
+                i.status = document.getElementById('editStatus').value;
+                i.startDate = document.getElementById('editStartDate').value;
+                i.endDate = document.getElementById('editEndDate').value || null;
+                const rd = document.getElementById('editResolutionDesc').value;
+                const tech = document.getElementById('editTechnician').value;
+                const rdate = document.getElementById('editResolutionDate').value;
+                if(rd || tech || rdate) i.resolution = { description: rd, technician: tech, resolutionDate: rdate };
+                else i.resolution = null;
+                saveIncidents();
+                renderIncidentsTable();
+                closeEditModal();
+                showToast('success','Modifié','Incident mis à jour');
+            }
+        }
+        
+        function closeIncidentModal(){ document.getElementById('incidentDetailModal').classList.remove('show'); }
+        function closeEditModal(){ document.getElementById('editIncidentModal').classList.remove('show'); }
+        
+        function renderMaintenancesTable(){
+            const tbody = document.querySelector('#maintenanceTable tbody');
+            if(tbody) tbody.innerHTML = maintenances.map(m=>`<tr><td>${m.id}</td><td>${m.ticketNumber}</td><td>${m.name}</td><td>${m.type}</td><td>${new Date(m.scheduledDate).toLocaleDateString()}</td><td>${m.status}</td><td><button onclick="deleteMaintenance(${m.id})" class="btn-danger btn-sm">🗑️</button></td></tr>`).join('');
+        }
+        
+        function updateDashboard(){
+            document.getElementById('openIncidents').textContent = incidents.filter(i=>i.status==='open'||i.status==='in-progress').length;
+            document.getElementById('plannedMaintenance').textContent = maintenances.filter(m=>m.status==='planned').length;
+            document.getElementById('criticalIncidents').textContent = incidents.filter(i=>i.priority==='critical').length;
+            const resolved = incidents.filter(i=>i.status==='resolved'||i.status==='closed').length;
+            document.getElementById('resolutionRate').textContent = incidents.length ? Math.round(resolved/incidents.length*100)+'%' : '0%';
+            document.getElementById('openSupportTickets').textContent = supportTickets.filter(t=>t.status==='open'||t.status==='in-progress').length;
+            
+            const recentTbody = document.querySelector('#recentIncidents tbody');
+            if(recentTbody) recentTbody.innerHTML = incidents.slice(-5).reverse().map(i=>`<tr><td>${i.id}</td><td>${i.ticketNumber}</td><td>${i.name}</td><td><span class="badge ${i.priority==='critical'?'badge-critical':'badge-high'}">${i.priority}</span></td><td>${i.status}</td><td>${formatDateShort(i.startDate)}</td><td>${i.endDate?formatDateShort(i.endDate):'En cours'}</td><td>${calculateDuration(i.startDate,i.endDate)}</td></tr>`).join('');
+            
+            const recentSupport = document.querySelector('#recentSupportTickets tbody');
+            if(recentSupport) recentSupport.innerHTML = supportTickets.slice(-5).reverse().map(t=>`<tr><td>${t.id}</td><td>${t.ticketNumber}</td><td>${t.name}</td><td>${t.typeLabel}</td><td>${t.priorityLabel}</td><td>${t.statusLabel}</td></tr>`).join('');
+        }
+        
+        function renderSupportTickets(){
+            const tbody = document.querySelector('#supportTable tbody');
+            if(!tbody) return;
+            const statusF = document.getElementById('filterSupportStatus')?.value||'';
+            const typeF = document.getElementById('filterSupportType')?.value||'';
+            const priorityF = document.getElementById('filterSupportPriority')?.value||'';
+            let filtered = supportTickets;
+            if(statusF) filtered = filtered.filter(t=>t.status===statusF);
+            if(typeF) filtered = filtered.filter(t=>t.type===typeF);
+            if(priorityF) filtered = filtered.filter(t=>t.priority===priorityF);
+            tbody.innerHTML = filtered.map(t=>`<tr><td>${t.id}</td><td>${t.ticketNumber}</td><td>${t.name}</td><td>${t.departmentLabel}</td><td>${t.typeLabel}</td><td><span class="badge ${t.priority==='critical'?'badge-critical':'badge-high'}">${t.priorityLabel}</span></td><td><span class="badge">${t.statusLabel}</span></td><td>${new Date(t.createdAt).toLocaleDateString()}</td><td><button onclick="updateSupportStatus(${t.id},'in-progress')" class="btn-warning btn-sm">En cours</button><button onclick="updateSupportStatus(${t.id},'resolved')" class="btn-success btn-sm">Résoudre</button><button onclick="deleteSupportTicket(${t.id})" class="btn-danger btn-sm">🗑️</button></td></tr>`).join('');
+        }
+        
+        function createSupportTicket(e){
+            e.preventDefault();
+            const type = document.getElementById('supportType').value;
+            const typeLabels = { hardware:"Matériel", software:"Logiciel", network:"Réseau", access:"Accès", other:"Autre" };
+            const priority = document.getElementById('supportPriority').value;
+            const priorityLabels = { low:"Basse", medium:"Moyenne", high:"Haute", critical:"Critique" };
+            const dept = document.getElementById('supportDepartment').value;
+            supportTickets.push({ id: nextSupportId++, ticketNumber: `SUP-${(nextSupportTicket++).toString().padStart(4,'0')}`, name: document.getElementById('supportName').value, department: dept, departmentLabel: departmentLabels[dept], type: type, typeLabel: typeLabels[type], description: document.getElementById('supportDescription').value, priority: priority, priorityLabel: priorityLabels[priority], status: 'open', statusLabel: 'Ouvert', createdAt: new Date().toISOString() });
+            saveSupportTickets();
+            renderSupportTickets();
+            document.getElementById('supportForm').reset();
+            updateSupportTicketNumber();
+            showToast('success','Créé','Ticket support créé');
+        }
+        
+        window.updateSupportStatus = function(id,status){
+            const t = supportTickets.find(x=>x.id===id);
+            if(t){ t.status=status; t.statusLabel=status==='open'?'Ouvert':(status==='in-progress'?'En cours':'Résolu'); saveSupportTickets(); renderSupportTickets(); showToast('info','Statut','Mis à jour'); }
+        };
+        
+        window.deleteSupportTicket = function(id){ if(confirm('Supprimer ?')){ supportTickets=supportTickets.filter(x=>x.id!==id); saveSupportTickets(); renderSupportTickets(); showToast('success','Supprimé','Demande supprimée'); } };
+        
+        function updateSupportTicketNumber(){ document.getElementById('supportTicketNumber').textContent = nextSupportTicket.toString().padStart(4,'0'); }
+        
+        function createIncident(e){
+            e.preventDefault();
+            const startDate = document.getElementById('incidentStartDate').value;
+            if(!startDate){ showToast('error','Erreur','Date de début requise'); return; }
+            incidents.push({ id: nextIncidentId++, ticketNumber: `INC-${(nextIncidentTicket++).toString().padStart(4,'0')}`, name: document.getElementById('incidentName').value, department: document.getElementById('incidentDepartment').value, description: document.getElementById('incidentDescription').value, priority: document.getElementById('incidentPriority').value, status: 'open', startDate: startDate, endDate: null, resolution: null });
+            saveIncidents();
+            localStorage.setItem('nextIncidentId',nextIncidentId);
+            localStorage.setItem('nextIncidentTicket',nextIncidentTicket);
+            renderIncidentsTable();
+            updateDashboard();
+            document.getElementById('incidentForm').reset();
+            document.getElementById('incidentTicketNumber').textContent = nextIncidentTicket.toString().padStart(4,'0');
+            document.getElementById('incidentStartDate').value = new Date().toISOString().slice(0,16);
+            showToast('success','Incident créé','Ticket enregistré');
+        }
+        
+        function createMaintenance(e){
+            e.preventDefault();
+            maintenances.push({ id: nextMaintenanceId++, ticketNumber: `MNT-${(nextMaintenanceTicket++).toString().padStart(4,'0')}`, name: document.getElementById('maintenanceName').value, department: document.getElementById('maintenanceDepartment').value, description: document.getElementById('maintenanceDescription').value, type: document.getElementById('maintenanceType').value, scheduledDate: document.getElementById('maintenanceScheduledDate').value, status: 'planned', createdAt: new Date().toISOString() });
+            saveMaintenances();
+            renderMaintenancesTable();
+            updateDashboard();
+            document.getElementById('maintenanceForm').reset();
+            showToast('success','Planifiée','Maintenance enregistrée');
+        }
+        
+        window.deleteIncident = function(id){ if(confirm('Supprimer ?')){ incidents=incidents.filter(i=>i.id!==id); saveIncidents(); renderIncidentsTable(); updateDashboard(); showToast('success','Supprimé','Incident supprimé'); } };
+        window.deleteMaintenance = function(id){ maintenances=maintenances.filter(m=>m.id!==id); saveMaintenances(); renderMaintenancesTable(); updateDashboard(); showToast('success','Supprimé','Maintenance supprimée'); };
+        
+        function exportToExcel(data,filename,sheetName){ const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,sheetName); XLSX.writeFile(wb,`${filename}.xlsx`); }
+        
+        function exportIncidentsReport(){ exportToExcel(incidents.map(i=>({ID:i.id,Ticket:i.ticketNumber,Nom:i.name,Département:departmentLabels[i.department],Description:i.description,Priorité:i.priority,Statut:i.status,Date_début:new Date(i.startDate).toLocaleString('fr-FR'),Date_fin:i.endDate?new Date(i.endDate).toLocaleString('fr-FR'):'En cours',Durée:calculateDuration(i.startDate,i.endDate),Résolution:i.resolution?.description||''})),'rapport_incidents','Incidents'); showToast('success','Export','Rapport incidents exporté'); }
+        
+        function exportSupportReport(){ exportToExcel(supportTickets.map(t=>({ID:t.id,Ticket:t.ticketNumber,Demandeur:t.name,Département:t.departmentLabel,Type:t.typeLabel,Description:t.description,Priorité:t.priorityLabel,Statut:t.statusLabel,Date_creation:new Date(t.createdAt).toLocaleString('fr-FR')})),'rapport_support','Support'); showToast('success','Export','Rapport support exporté'); }
+        
+        function exportPrintersReport(){ exportToExcel(printers.map(p=>({Nom:p.name,Modèle:p.model,Département:p.departmentLabel,Dernière_recharge:new Date(p.lastRefill).toLocaleDateString('fr-FR'),Jours_écoulés:calculateDaysSince(p.lastRefill),Statut:calculateDaysSince(p.lastRefill)>=refillReminderDays?'Urgent':'OK'})),'rapport_imprimantes','Imprimantes'); showToast('success','Export','Rapport imprimantes exporté'); }
+        
+        function exportFullReport(){
+            // Préparer les données
+            const incidentsData = incidents.map(i => ({
+                ID: i.id,
+                Ticket: i.ticketNumber,
+                Nom: i.name,
+                Département: departmentLabels[i.department],
+                Description: i.description,
+                Priorité: i.priority,
+                Statut: i.status,
+                Date_début: new Date(i.startDate).toLocaleString('fr-FR'),
+                Date_fin: i.endDate ? new Date(i.endDate).toLocaleString('fr-FR') : 'En cours',
+                Durée: calculateDuration(i.startDate, i.endDate),
+                Résolution: i.resolution?.description || ''
+            }));
+            
+            const supportData = supportTickets.map(t => ({
+                ID: t.id,
+                Ticket: t.ticketNumber,
+                Demandeur: t.name,
+                Département: t.departmentLabel,
+                Type: t.typeLabel,
+                Description: t.description,
+                Priorité: t.priorityLabel,
+                Statut: t.statusLabel,
+                Date_création: new Date(t.createdAt).toLocaleString('fr-FR')
+            }));
+            
+            const printersData = printers.map(p => ({
+                Nom: p.name,
+                Modèle: p.model,
+                Département: p.departmentLabel,
+                Dernière_recharge: new Date(p.lastRefill).toLocaleDateString('fr-FR'),
+                Jours_écoulés: calculateDaysSince(p.lastRefill),
+                Statut: calculateDaysSince(p.lastRefill) >= refillReminderDays ? 'Urgent' : 'OK'
+            }));
+            
+            // Créer le classeur avec plusieurs onglets
+            const wb = XLSX.utils.book_new();
+            const wsIncidents = XLSX.utils.json_to_sheet(incidentsData);
+            const wsSupport = XLSX.utils.json_to_sheet(supportData);
+            const wsPrinters = XLSX.utils.json_to_sheet(printersData);
+            
+            XLSX.utils.book_append_sheet(wb, wsIncidents, "Incidents");
+            XLSX.utils.book_append_sheet(wb, wsSupport, "Support_Technique");
+            XLSX.utils.book_append_sheet(wb, wsPrinters, "Imprimantes");
+            
+            XLSX.writeFile(wb, `rapport_complet_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+            showToast('success','Export complet','Les 3 rapports ont été exportés dans un seul fichier Excel avec 3 onglets');
+        }
+        
+        function initCharts(){
+            const ctx1 = document.getElementById('reportsPriorityChart')?.getContext('2d');
+            if(ctx1) new Chart(ctx1,{type:'pie',data:{labels:['Critique','Majeur','Mineur'],datasets:[{data:[incidents.filter(i=>i.priority==='critical').length,incidents.filter(i=>i.priority==='major').length,incidents.filter(i=>i.priority==='minor').length],backgroundColor:['#e74c3c','#f39c12','#2ecc71']}]}});
+            const ctx2 = document.getElementById('supportTypeChart')?.getContext('2d');
+            if(ctx2){ const types={hardware:0,software:0,network:0,access:0}; supportTickets.forEach(t=>types[t.type]++); new Chart(ctx2,{type:'bar',data:{labels:['Matériel','Logiciel','Réseau','Accès'],datasets:[{label:"Demandes",data:[types.hardware,types.software,types.network,types.access],backgroundColor:'#3498db'}]}}); }
+            const ctx3 = document.getElementById('supportTrendChart')?.getContext('2d');
+            if(ctx3){ const last7Days=[]; for(let i=6;i>=0;i--){let d=new Date(); d.setDate(d.getDate()-i); last7Days.push(d.toLocaleDateString());} const counts=last7Days.map(day=>supportTickets.filter(t=>new Date(t.createdAt).toLocaleDateString()===day).length); new Chart(ctx3,{type:'line',data:{labels:last7Days,datasets:[{label:'Demandes',data:counts,borderColor:'#e74c3c',tension:0.4}]}}); }
+            const ctx4 = document.getElementById('refillsChart')?.getContext('2d');
+            if(ctx4){ const deptCount={}; printers.forEach(p=>{deptCount[p.departmentLabel]=(deptCount[p.departmentLabel]||0)+1;}); new Chart(ctx4,{type:'bar',data:{labels:Object.keys(deptCount),datasets:[{label:"Imprimantes",data:Object.values(deptCount),backgroundColor:'#2ecc71'}]}}); }
+        }
+        
+        function showToast(type,title,message){ const toast=document.getElementById('toast'); toast.className=`toast show ${type}`; document.getElementById('toastTitle').textContent=title; document.getElementById('toastMessage').textContent=message; setTimeout(()=>toast.classList.remove('show'),3000); }
+        
+        function login(username,password){
+            if(username==='admin' && password==='Admin@123'){
+                currentUser={fullname:'Administrateur',avatar:'A'};
+                document.getElementById('loginModal').style.display='none';
+                document.getElementById('mainApp').style.display='block';
+                document.getElementById('userName').textContent=currentUser.fullname;
+                document.getElementById('userAvatar').textContent=currentUser.avatar;
+                document.getElementById('incidentStartDate').value = new Date().toISOString().slice(0,16);
+                renderIncidentsTable();
+                renderMaintenancesTable();
+                renderPrinters();
+                renderSupportTickets();
+                updateDashboard();
+                document.getElementById('incidentTicketNumber').textContent = nextIncidentTicket.toString().padStart(4,'0');
+                updateSupportTicketNumber();
+                initCharts();
+                showToast('success','Connexion','Bienvenue');
+            } else showToast('error','Erreur','Identifiants incorrects');
+        }
+        
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit',(e)=>{e.preventDefault(); login(document.getElementById('loginUsername').value,document.getElementById('loginPassword').value);});
+        document.getElementById('incidentForm').addEventListener('submit',createIncident);
+        document.getElementById('maintenanceForm').addEventListener('submit',createMaintenance);
+        document.getElementById('supportForm').addEventListener('submit',createSupportTicket);
+        document.getElementById('exportExcelBtn').addEventListener('click',exportFullReport);
+        document.getElementById('exportIncidentsReport').addEventListener('click',exportIncidentsReport);
+        document.getElementById('exportSupportReport').addEventListener('click',exportSupportReport);
+        document.getElementById('exportPrintersReport').addEventListener('click',exportPrintersReport);
+        document.getElementById('exportFullReport').addEventListener('click',exportFullReport);
+        document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; document.getElementById('mainApp').style.display='none'; document.getElementById('loginModal').style.display='flex'; });
+        document.getElementById('addPrinterBtn').addEventListener('click',()=>document.getElementById('printerModal').classList.add('show'));
+        document.getElementById('savePrinterBtn').addEventListener('click',()=>{ const name=document.getElementById('printerName').value, model=document.getElementById('printerModel').value, dept=document.getElementById('printerDepartment').value, date=document.getElementById('lastRefillDate').value; if(name&&model&&dept&&date){ addPrinter(name,model,dept,date); document.getElementById('printerModal').classList.remove('show'); document.getElementById('printerName').value=''; document.getElementById('printerModel').value=''; document.getElementById('lastRefillDate').value=''; } else showToast('error','Erreur','Tous les champs requis'); });
+        document.getElementById('saveSettings').addEventListener('click',()=>{ refillReminderDays=parseInt(document.getElementById('refillReminderDays').value); localStorage.setItem('refillReminderDays',refillReminderDays); renderPrinters(); showToast('success','Paramètres','Mis à jour'); });
+        document.getElementById('filterStatus').addEventListener('change',renderIncidentsTable);
+        document.getElementById('filterDepartment').addEventListener('change',renderIncidentsTable);
+        document.getElementById('filterPriority').addEventListener('change',renderIncidentsTable);
+        document.getElementById('filterSupportStatus').addEventListener('change',renderSupportTickets);
+        document.getElementById('filterSupportType').addEventListener('change',renderSupportTickets);
+        document.getElementById('filterSupportPriority').addEventListener('change',renderSupportTickets);
+        document.querySelectorAll('.close-modal').forEach(btn=>btn.addEventListener('click',function(){ this.closest('.modal').classList.remove('show'); }));
+        document.querySelectorAll('.tab-link').forEach(link=>{ link.addEventListener('click',()=>{ const tabId=link.getAttribute('data-tab'); document.querySelectorAll('.tab-link').forEach(l=>l.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); link.classList.add('active'); document.getElementById(tabId).classList.add('active'); if(tabId==='ink') renderPrinters(); if(tabId==='support') renderSupportTickets(); if(tabId==='dashboard') updateDashboard(); if(tabId==='reports') initCharts(); }); });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion d'Incidents - Encre & Support Technique & Maintenance IT</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --info: #9b59b6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 25px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+        }
+        
+        .sync-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            background-color: var(--light);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tabs li {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .nav-tabs a {
+            display: block;
+            padding: 15px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-tabs a:hover, .nav-tabs a.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light);
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .badge-critical { background-color: var(--danger); color: white; }
+        .badge-high { background-color: var(--warning); color: white; }
+        .badge-medium { background-color: var(--secondary); color: white; }
+        .badge-low { background-color: var(--success); color: white; }
+        .badge-open { background-color: #e74c3c; color: white; }
+        .badge-progress { background-color: #f39c12; color: white; }
+        .badge-resolved { background-color: #2ecc71; color: white; }
+        .badge-closed { background-color: #95a5a6; color: white; }
+        
+        .printer-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .printer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .printer-info {
+            flex: 2;
+        }
+        
+        .printer-info h3 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .printer-recharge {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card p {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 5px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 5px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1100;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+        
+        .info-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+        
+        .ticket-info {
+            background: var(--light);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .ticket-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            width: 160px;
+            color: var(--primary);
+        }
+        
+        .detail-value {
+            flex: 1;
+        }
+        
+        .resolution-box {
+            background-color: #e8f8f5;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+        
+        .duration-badge {
+            background: var(--info);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        .date-cell {
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .incident-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .incident-stat-card {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .incident-stat-card h4 {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .incident-stat-card .number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs { flex-direction: column; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .printer-card { flex-direction: column; text-align: center; }
+            .detail-label { width: 120px; }
+            .date-cell { white-space: normal; }
+            .incident-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal show" style="background: rgba(0,0,0,0.9);">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>🔐 Connexion à l'application</h3>
+            </div>
+            <div class="modal-body">
+                <div class="info-box">
+                    <h4>👤 Identifiants par défaut :</h4>
+                    <div style="background: var(--light); padding: 10px; border-radius: 5px;">
+                        <p><strong>Nom d'utilisateur :</strong> admin</p>
+                        <p><strong>Mot de passe :</strong> Admin@123</p>
+                    </div>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Nom d'utilisateur</label>
+                        <input type="text" id="loginUsername" value="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="loginPassword" value="Admin@123" required>
+                    </div>
+                    <button type="submit" class="btn-success" style="width: 100%;">Se connecter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainApp" style="display: none;">
+        <header>
+            <h1>📋 Gestion d'Incidents - Encre & Support Technique & Maintenance IT</h1>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div id="userName">Administrateur</div>
+                        <div class="sync-status">
+                            <span class="sync-dot"></span>
+                            <span>Connecté</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="exportExcelBtn" class="btn-success">📊 Export Excel Complet</button>
+                <button id="logoutBtn" class="btn-danger">🚪 Déconnexion</button>
+            </div>
+        </header>
+        
+        <ul class="nav-tabs">
+            <li><a class="tab-link active" data-tab="dashboard">📊 Tableau de bord</a></li>
+            <li><a class="tab-link" data-tab="incidents">⚠️ Incidents</a></li>
+            <li><a class="tab-link" data-tab="maintenance">🔧 Maintenance</a></li>
+            <li><a class="tab-link" data-tab="ink">🖨️ Gestion d'encre</a></li>
+            <li><a class="tab-link" data-tab="support">🛠️ Support technique</a></li>
+            <li><a class="tab-link" data-tab="reports">📈 Rapports</a></li>
+            <li><a class="tab-link" data-tab="settings">⚙️ Paramètres</a></li>
+        </ul>
+        
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card"><h3>Incidents ouverts</h3><p id="openIncidents">0</p></div>
+                <div class="stat-card"><h3>Maintenances planifiées</h3><p id="plannedMaintenance">0</p></div>
+                <div class="stat-card"><h3>Incidents critiques</h3><p id="criticalIncidents">0</p></div>
+                <div class="stat-card"><h3>Taux de résolution</h3><p id="resolutionRate">0%</p></div>
+                <div class="stat-card"><h3>Imprimantes</h3><p id="totalPrinters">0</p></div>
+                <div class="stat-card"><h3>Tickets support ouverts</h3><p id="openSupportTickets">0</p></div>
+            </div>
+            
+            <div class="card">
+                <h2>📋 Incidents récents</h2>
+                <table id="recentIncidents"><thead><tr><th>ID</th><th>Ticket</th><th>Nom</th><th>Priorité</th><th>Statut</th><th>Date début</th><th>Date fin</th><th>Durée</th></tr></thead><tbody></tbody></table>
+            </div>
+            
+            <div class="card">
+                <h2>🖨️ Prochaines recharges d'encre</h2>
+                <div id="upcomingRefills"></div>
+            </div>
+            
+            <div class="card">
+                <h2>🛠️ Demandes support récentes</h2>
+                <table id="recentSupportTickets"><thead><tr><th>ID</th><th>Ticket</th><th>Demandeur</th><th>Type</th><th>Priorité</th><th>Statut</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+        
         <!-- INCIDENTS - SECTION COMPLÈTEMENT ACTIVE -->
         <div id="incidents" class="tab-content">
             <div class="card">
